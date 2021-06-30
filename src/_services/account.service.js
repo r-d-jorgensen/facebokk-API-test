@@ -23,18 +23,10 @@ async function login() {
     const { authResponse } = await new Promise((resolve, reject) => {
         window.FB.login(function(response) {
             response.authResponse ? resolve(response) : reject('Error');
-        }, {scope: ['email', 'user_posts']});
+        }, {scope: ['email', 'public_profile']});
     });
     if (!authResponse) return;
     await apiAuthenticate(authResponse.accessToken);
-    window.FB.api(
-        '/me/feed',
-        'GET',
-        {},
-        function(response) {
-            console.log(response);
-        }
-    );
     // get return url from location state or default to home page
     const { from } = history.location.state || { from: { pathname: "/" } };
     history.push(from);
@@ -46,6 +38,7 @@ async function apiAuthenticate(accessToken) {
     const response = await axios.post(`${baseUrl}/authenticate`, { accessToken });
     const account = response.data;
     accountSubject.next(account);
+    console.log(account)
     startAuthenticateTimer();
     return account;
 }
