@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 function Home() {
-    const [account, setAccount] = useState();
-    const [email, setEmail] = useState();
+    const [account, setAccount] = useState({});
+    const [email, setEmail] = useState("");
 
     useEffect(() => {
         window.FB.api(
