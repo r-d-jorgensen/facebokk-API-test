@@ -20,10 +20,21 @@ export const accountService = {
 
 async function login() {
     // login with facebook then authenticate with the API to get a JWT auth token
-    const { authResponse } = await new Promise(window.FB.login);
+    const { authResponse } = await new Promise((resolve, reject) => {
+        window.FB.login(function(response) {
+            response.authResponse ? resolve(response) : reject('Error');
+        }, {scope: ['email', 'user_posts']});
+    });
     if (!authResponse) return;
-
     await apiAuthenticate(authResponse.accessToken);
+    window.FB.api(
+        '/me/feed',
+        'GET',
+        {},
+        function(response) {
+            console.log(response);
+        }
+    );
     // get return url from location state or default to home page
     const { from } = history.location.state || { from: { pathname: "/" } };
     history.push(from);
