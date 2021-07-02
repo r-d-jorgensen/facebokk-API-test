@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 function Home() {
-    const [error, setError] = useState("")
-    const [sucess, setSucess] = useState(0)
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [sucess, setSucess] = useState(false);
     const [account, setAccount] = useState({});
 
     useEffect(() => {
@@ -13,16 +14,23 @@ function Home() {
             function(response) {
                 if (response && !response.error) {
                     setAccount(response);
-                    setSucess(1);
-                    console.log(response);
+                    setSucess(true);
                 } else {
                     setError(response.error);
-                    setSucess(0);
+                    setSucess(false);
                 }
+                setLoading(false);
             }
         );
     }, []);
-    if (sucess) {
+    
+    if (loading) {
+        return (
+            <div>
+                <h1>Now Loading Your Informaition</h1>
+            </div>
+        );
+    } else if (sucess) {
         return (
             <div>
                 <img src={account.picture.data.url} alt="" width={account.picture.data.width} height={account.picture.data.hight}></img>
