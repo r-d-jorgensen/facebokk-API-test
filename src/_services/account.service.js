@@ -38,7 +38,6 @@ async function apiAuthenticate(accessToken) {
     const response = await axios.post(`${baseUrl}/authenticate`, { accessToken });
     const account = response.data;
     accountSubject.next(account);
-    console.log(account)
     startAuthenticateTimer();
     return account;
 }
