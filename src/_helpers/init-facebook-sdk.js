@@ -1,6 +1,8 @@
 import { accountService } from '_services';
 
-const facebookAppId = process.env.REACT_APP_FACEBOOK_APP_ID;
+const facebookAppId = process.env.NODE_ENV === "development"
+                        ? process.env.REACT_APP_FACEBOOK_APP_ID_DEV
+                        : process.env.REACT_APP_FACEBOOK_APP_ID;
 
 export function initFacebookSdk() {
     return new Promise(resolve => {

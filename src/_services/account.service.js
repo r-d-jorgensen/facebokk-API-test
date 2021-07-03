@@ -3,7 +3,9 @@ import axios from 'axios';
 
 import { history } from '_helpers';
 
-const baseUrl = `${process.env.REACT_APP_API_URL}/accounts`;
+const baseUrl = `${process.env.NODE_ENV === "development"
+                    ? process.env.REACT_APP_FACEBOOK_APP_ID_DEV
+                    : process.env.REACT_APP_FACEBOOK_APP_ID}/accounts`;
 const accountSubject = new BehaviorSubject(null);
 
 export const accountService = {
