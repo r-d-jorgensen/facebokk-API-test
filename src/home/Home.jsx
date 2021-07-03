@@ -5,6 +5,7 @@ function Home() {
     const [error, setError] = useState("");
     const [sucess, setSucess] = useState(false);
     const [account, setAccount] = useState({});
+    const [feed, setFeed] = useState({});
 
     useEffect(() => {
         window.FB.api(
@@ -19,11 +20,31 @@ function Home() {
                     setError(response.error);
                     setSucess(false);
                 }
-                setLoading(false);
+                window.FB.api(
+                    '/me/feed',
+                    'GET',
+                    {},
+                    function(response) {
+                        if (response && !response.error) {
+                            setFeed(response);
+                            setSucess(true);
+                        } else {
+                            setError(response.error);
+                            setSucess(false);
+                        }
+                        setLoading(false);
+                    }
+                );
             }
         );
     }, []);
     
+    function cleanTheDate(dateStr) {
+        return new Date(dateStr).toISOString()
+            .replace(/T/, ' ')
+            .replace(/\..+/, '')
+    }
+
     if (loading) {
         return (
             <div>
@@ -37,6 +58,12 @@ function Home() {
                 <h3>Facebook ID: {account.id}</h3>
                 <h3>Facebook Name: {account.name}</h3>
                 <h3>Facebook Email: {account.email}</h3>
+                <div>
+                    <h3>Feed on Page 1</h3>
+                    {Object.keys(feed.data).map((post, i) => 
+                        <p key={i}>Post Time {cleanTheDate(feed.data[post].created_time)}: {feed.data[post].message}</p>
+                    )}
+                </div>
             </div>
         );
     } else {
