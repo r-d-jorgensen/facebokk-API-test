@@ -10,7 +10,7 @@ function Home() {
         window.FB.api(
             '/me',
             'GET',
-            {"fields":"id,name,email,picture,gender"},
+            {"fields":"id,name,email,picture"},
             function(response) {
                 if (response && !response.error) {
                     setAccount(response);

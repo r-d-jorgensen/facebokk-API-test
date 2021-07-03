@@ -5,16 +5,12 @@ import { render } from 'react-dom';
 // global stylesheet
 import './index.css';
 
-import { initFacebookSdk, jwtInterceptor, errorInterceptor, history } from './_helpers';
+import { initFacebookSdk, history } from './_helpers';
 import { App } from './App';
 
 // setup fake backend
 import { fakeBackend } from './_helpers';
 fakeBackend();
-
-// enable interceptors for http requests
-jwtInterceptor();
-errorInterceptor();
 
 // wait for facebook sdk before startup
 initFacebookSdk().then(startApp);
