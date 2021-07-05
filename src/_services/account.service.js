@@ -21,7 +21,7 @@ async function login() {
     const { authResponse } = await new Promise((resolve, reject) => {
         window.FB.login(function(response) {
             response.authResponse ? resolve(response) : reject('Error');
-        }, {scope: ['email', 'public_profile', 'user_posts']});
+        }, {scope: ['email', 'public_profile', 'user_posts', 'user_photos', 'user_videos', 'user_friends']});
     });
     if (!authResponse) return;
     await apiAuthenticate(authResponse.accessToken);

@@ -23,7 +23,7 @@ function Home() {
                 window.FB.api(
                     '/me/feed',
                     'GET',
-                    {},
+                    {"fields":"id,message,created_time,attachments"},
                     function(response) {
                         if (response && !response.error) {
                             setFeed(response);
@@ -60,8 +60,23 @@ function Home() {
                 <h3>Facebook Email: {account.email}</h3>
                 <div>
                     <h3>Feed on Page 1</h3>
-                    {Object.keys(feed.data).map((post, i) => 
-                        <p key={i}>Post Time {cleanTheDate(feed.data[post].created_time)}: {feed.data[post].message}</p>
+                    {Object.keys(feed.data).map(i => 
+                        <div key={i}>
+                            <p>Post Time {cleanTheDate(feed.data[i].created_time)}: {feed.data[i].message}</p>
+                            {!feed.data[i].hasOwnProperty('attachments') ? null : Object.keys(feed.data[i].attachments.data).map(j => {
+                                if (feed.data[i].attachments.data[j].type === 'photo')
+                                    return <img
+                                        key={j}
+                                        src={feed.data[i].attachments.data[j].media.image.src}
+                                        alt=""
+                                        width={feed.data[i].attachments.data[j].media.image.width}
+                                        height={feed.data[i].attachments.data[j].media.image.height} />
+                                else if (feed.data[i].attachments.data[j].type === 'video')
+                                    return <p key={j}>Video</p>
+                                else 
+                                    return <p key={j}>Other Attachment</p>
+                            })}
+                        </div>
                     )}
                 </div>
             </div>
