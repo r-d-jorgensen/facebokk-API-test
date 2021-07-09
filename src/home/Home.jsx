@@ -3,10 +3,8 @@ import React, { useState, useEffect } from 'react';
 function Home() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [sucess, setSucess] = useState(false);
     const [account, setAccount] = useState({});
-    const [feed, setFeed] = useState({});
-    const [friendsList, setFriendsList] = useState();
+    const [feed, setFeed] = useState([]);
 
     useEffect(() => {
         window.FB.api(
@@ -16,7 +14,8 @@ function Home() {
             function(response) {
                 if (response && !response.error) {
                     setAccount(response);
-                    setSucess(true);
+                } else {
+                    setError(response.error);
                 }
                 window.FB.api(
                     '/me/feed',
@@ -24,22 +23,14 @@ function Home() {
                     {"fields":"id,message,created_time,attachments"},
                     function(response) {
                         if (response && !response.error) {
-                            setFeed(response);
-                            setSucess(true);
+                            setFeed(response.data);
+                            console.log(response.data);
+                        } else {
+                            setError(response.error);
                         }
-                        window.FB.api(
-                            "/me/friendlists",
-                            function (response) {
-                                if (response && !response.error) {
-                                    setFriendsList(response);
-                                } else {
-                                    setError(response.error);
-                                }
-                                setLoading(false);
-                            }
-                        );
                     }
                 );
+                setLoading(false);
             }
         );
     }, []);
@@ -50,14 +41,47 @@ function Home() {
             .replace(/\..+/, '')
     }
 
+    function postAttachments(attachments) {
+        if (attachments[0].type === 'album') {
+            return attachments[0].subattachments.data.map(subattachment => 
+                <img
+                    key={subattachment.target.id}
+                    src={subattachment.media.image.src}
+                    alt=""
+                    width={subattachment.media.image.width}
+                    height={subattachment.media.image.height} />
+            )
+        } else if (attachments[0].type === 'photo') {
+            return (
+                <img
+                    src={attachments[0].media.image.src}
+                    alt=""
+                    width={attachments[0].media.image.width}
+                    height={attachments[0].media.image.height} />
+            )
+        } else if (attachments[0].type === 'share') {
+            return (
+                <p>This is an shared Link: <a href={attachments[0].url}>{attachments[0].title}</a></p>
+            )
+        } else if (attachments[0].type === 'video_autoplay') {
+            return (
+                <p>This is ment to be a video and this type not yet supported</p>
+            )
+        } else {
+            console.log(attachments[0].type);
+            return (
+                <p>This attachemnt is not recognized</p>
+            )
+        }
+    }
+
     if (loading) {
         return (
             <div>
                 <h1>Now Loading Your Informaition</h1>
             </div>
         );
-    } else if (sucess) {
-        console.log(feed);
+    } else if (!error) {
         return (
             <div>
                 <img src={account.picture.data.url} alt="" width={account.picture.data.width} height={account.picture.data.hight}></img>
@@ -65,34 +89,19 @@ function Home() {
                 <h3>Facebook Name: {account.name}</h3>
                 <h3>Facebook Email: {account.email}</h3>
                 <div>
-                    <h3>Feed on Page 1</h3>
-                    {Object.keys(feed.data).map(i => 
-                        <div key={i}>
-                            <p>Post Time {cleanTheDate(feed.data[i].created_time)}: {feed.data[i].message}</p>
-                            {!feed.data[i].hasOwnProperty('attachments') ? null : Object.keys(feed.data[i].attachments.data).map(j => {
-                                if (feed.data[i].attachments.data[j].type === 'photo')
-                                    return <img
-                                        key={j}
-                                        src={feed.data[i].attachments.data[j].media.image.src}
-                                        alt=""
-                                        width={feed.data[i].attachments.data[j].media.image.width}
-                                        height={feed.data[i].attachments.data[j].media.image.height} />
-                                else if (feed.data[i].attachments.data[j].type === 'video')
-                                    return <p key={j}>Video</p>
-                                else if (feed.data[i].attachments.data[j].type === 'life_event')
-                                    return <p key={j}>Event: {feed.data[i].attachments.data[j].title}</p>
-                                else if (feed.data[i].attachments.data[j].type === 'share')
-                                    return <img
-                                        key={j}
-                                        src={feed.data[i].attachments.data[j].media.image.src}
-                                        alt=""
-                                        width={feed.data[i].attachments.data[j].media.image.width}
-                                        height={feed.data[i].attachments.data[j].media.image.height} />
-                                else 
-                                    return <p key={j}>Other Attachment</p>
-                            })}
-                        </div>
-                    )}
+                    <h3>Feed on Page 1:</h3>
+                    {feed.map(post => <div key={post.id}>
+                        <h4>Post: {post.id}</h4>
+                        <h6>Time Made: {cleanTheDate(post.created_time)}:</h6>
+                        <h6>Message - </h6>
+                        <p>{post.message}</p>
+                        {post.hasOwnProperty('attachments') ?
+                            <div>
+                                <h6>Post's Attachments:</h6>
+                                {postAttachments(post.attachments.data)}
+                            </div>
+                        : null}
+                    </div>)}
                 </div>
             </div>
         );

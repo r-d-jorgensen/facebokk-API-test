@@ -5,10 +5,10 @@ import { Nav, PrivateRoute } from '_components';
 import { Home } from 'home/Home';
 import { Login } from 'login/Login';
 
-console.log(process.env.VERSION);
+console.log('0.2.1');
 
 function App() {
-
+    
     return (
         <div>
             <Nav />
