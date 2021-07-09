@@ -67,10 +67,15 @@ function Home() {
             return (
                 <p>This is ment to be a video and this type not yet supported</p>
             )
+        } else if (attachments[0].type === 'life_event') {
+            return (
+                <p>Life Event: {attachments[0].title}</p>
+            )
         } else {
             console.log(attachments[0].type);
+            console.log(attachments[0]);
             return (
-                <p>This attachemnt is not recognized</p>
+                <p>This attachment is not recognized</p>
             )
         }
     }
@@ -90,7 +95,7 @@ function Home() {
                 <h3>Facebook Email: {account.email}</h3>
                 <div>
                     <h3>Feed on Page 1:</h3>
-                    {feed.map(post => <div key={post.id}>
+                    {feed.map((post, i) => <div key={i}>
                         <h4>Post: {post.id}</h4>
                         <h6>Time Made: {cleanTheDate(post.created_time)}:</h6>
                         <h6>Message - </h6>
