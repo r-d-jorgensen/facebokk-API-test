@@ -6,6 +6,7 @@ function Home() {
     const [sucess, setSucess] = useState(false);
     const [account, setAccount] = useState({});
     const [feed, setFeed] = useState({});
+    const [friendsList, setFriendsList] = useState();
 
     useEffect(() => {
         window.FB.api(
@@ -16,9 +17,6 @@ function Home() {
                 if (response && !response.error) {
                     setAccount(response);
                     setSucess(true);
-                } else {
-                    setError(response.error);
-                    setSucess(false);
                 }
                 window.FB.api(
                     '/me/feed',
@@ -28,11 +26,18 @@ function Home() {
                         if (response && !response.error) {
                             setFeed(response);
                             setSucess(true);
-                        } else {
-                            setError(response.error);
-                            setSucess(false);
                         }
-                        setLoading(false);
+                        window.FB.api(
+                            "/me/friendlists",
+                            function (response) {
+                                if (response && !response.error) {
+                                    setFriendsList(response);
+                                } else {
+                                    setError(response.error);
+                                }
+                                setLoading(false);
+                            }
+                        );
                     }
                 );
             }
@@ -52,6 +57,7 @@ function Home() {
             </div>
         );
     } else if (sucess) {
+        console.log(feed);
         return (
             <div>
                 <img src={account.picture.data.url} alt="" width={account.picture.data.width} height={account.picture.data.hight}></img>
@@ -73,6 +79,15 @@ function Home() {
                                         height={feed.data[i].attachments.data[j].media.image.height} />
                                 else if (feed.data[i].attachments.data[j].type === 'video')
                                     return <p key={j}>Video</p>
+                                else if (feed.data[i].attachments.data[j].type === 'life_event')
+                                    return <p key={j}>Event: {feed.data[i].attachments.data[j].title}</p>
+                                else if (feed.data[i].attachments.data[j].type === 'share')
+                                    return <img
+                                        key={j}
+                                        src={feed.data[i].attachments.data[j].media.image.src}
+                                        alt=""
+                                        width={feed.data[i].attachments.data[j].media.image.width}
+                                        height={feed.data[i].attachments.data[j].media.image.height} />
                                 else 
                                     return <p key={j}>Other Attachment</p>
                             })}
