@@ -5,6 +5,8 @@ import { Nav, PrivateRoute } from '_components';
 import { Home } from 'home/Home';
 import { Login } from 'login/Login';
 
+console.log(process.env.VERSION);
+
 function App() {
 
     return (
