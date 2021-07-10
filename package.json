@@ -1,6 +1,6 @@
 {
     "name": "react-facebook-login-example",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "dependencies": {
         "axios": "^0.20.0",
         "history": "^4.10.1",

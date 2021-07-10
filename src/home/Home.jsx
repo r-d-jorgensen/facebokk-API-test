@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 
 function Home() {
     const [error, setError] = useState();
-    const [feed, setFeed] = useState();
     const [account, setAccount] = useState();
+    const [feed, setFeed] = useState();
+    const [photos, setPhotos] = useState();
 
+    //API calls start at load
     useEffect(() => {
+        //account data call
         window.FB.api(
             '/me',
             'GET',
@@ -18,6 +21,7 @@ function Home() {
                 }
             }
         );
+        //feed data call
         window.FB.api(
             '/me/feed',
             'GET',
@@ -30,8 +34,29 @@ function Home() {
                 }
             }
         );
+        //photos data call
+        window.FB.api(
+            "/me/photos",
+            'GET',
+            {"fields":"id,name,created_time,images"},
+            function (response) {
+                if (response && !response.error) {
+                    setPhotos(response.data);
+                } else {
+                    setError(response.error);
+                }
+            }
+        );
     }, []);
 
+    //Turns t type to YYYY-MM-DD HH:MM:SS time type
+    function cleanTheDate(dateStr) {
+        return new Date(dateStr).toISOString()
+            .replace(/T/, ' ')
+            .replace(/\..+/, '')
+    }
+
+    //displays account info from API call
     function AccountDisplay() {
         if (!account) return <h1>Loading Your Informaition account information</h1>;
         return (
@@ -45,6 +70,8 @@ function Home() {
         
     }
 
+    //maps all posts of the user feed from the API call
+    //no pagination so only page 1
     function FeedDisplay() {
         function postAttachments(attachments) {
             if (attachments[0].type === 'album') {
@@ -85,16 +112,10 @@ function Home() {
             }
         }
 
-        function cleanTheDate(dateStr) {
-            return new Date(dateStr).toISOString()
-                .replace(/T/, ' ')
-                .replace(/\..+/, '')
-        }
-
         if (!feed) return <h3>Loading Your Facebook Feed</h3>;
         return (
             <div>
-                <h3>Feed on Page 1:</h3>
+                <h3>Feed [Page 1]:</h3>
                 {feed.map((post, i) => <div key={i}>
                         <h4>Post: {post.id}</h4>
                         <h6>Time Made: {cleanTheDate(post.created_time)}:</h6>
@@ -111,6 +132,26 @@ function Home() {
         );
     }
 
+    //maps all photos from the API call
+    //no pagination so only page 1
+    function PhotoDisplay() {
+        
+        if (!photos) return <h3>Loading Your Facebook Photos</h3>
+        return (
+            <div>
+                <h3>Photos [Page 1]:</h3>
+                {photos.map(photo => <div key={photo.id}>
+                    <p>Created on: {cleanTheDate(photo.created_time)}</p>
+                    <img
+                        src={photo.images[6].source}
+                        alt={photo.name ? photo.name : ""}
+                        width={photo.images[6].width}
+                        height={photo.images[6].height} />,
+                </div> )}
+            </div>
+        );
+    }
+
     if (error) {
         return (
             <div>
@@ -120,10 +161,12 @@ function Home() {
         );
     }
 
+    //top level display location
     return (
         <div>
             <AccountDisplay />
             <FeedDisplay />
+            <PhotoDisplay />
         </div>
     );
 }
