@@ -4,7 +4,6 @@ import { Error } from '_components/Error';
 function Home() {
     const [error, setError] = useState();
     const [account, setAccount] = useState();
-
     ///account data call
     useEffect(() => {
         window.FB.api(
@@ -19,10 +18,10 @@ function Home() {
                 }
             }
         );
-    });
+    }, []);
 
     if (!account) return <h1>Loading Your Informaition account information</h1>;
-    if (error) return (<Error error={error} />);
+    if (error) return <Error error={error} />;
     return (
         <div>
             <img src={account.picture.data.url} alt="" width={account.picture.data.width} height={account.picture.data.hight}></img>

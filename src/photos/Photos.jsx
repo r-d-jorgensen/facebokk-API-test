@@ -19,10 +19,11 @@ function Photos() {
         }
       }
     );
-  });
+  }, []);
 
   if (!photos) return <h3>Loading Your Facebook Photos</h3>;
-  if (error) return (<Error error={error} />);
+  if (error) return <Error error={error} />;
+  if (photos.length === 0) return <h3>You don't have any photos avalible</h3>;
   return (
     <div>
       <a href={photos[0].images[6].source} download>Click to download</a>

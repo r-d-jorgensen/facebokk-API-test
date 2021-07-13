@@ -19,7 +19,7 @@ function Feed() {
         }
       }
     );
-  });
+  }, []);
 
   function postAttachments(attachments) {
     if (attachments[0].type === 'album') {
@@ -53,7 +53,7 @@ function Feed() {
   }
 
   if (!feed) return <h3>Loading Your Facebook Feed</h3>;
-  if (error) return (<Error error={error} />);
+  if (error) return <Error error={error} />;
   return (
     <div>
       <h3>Feed [Page 1]:</h3>
