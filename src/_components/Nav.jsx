@@ -17,6 +17,7 @@ function Nav() {
             <div className="navbar-nav">
                 <NavLink exact to="/" className="nav-item nav-link">Home</NavLink>
                 <NavLink exact to="/photos" className="nav-item nav-link">Photos</NavLink>
+                <NavLink exact to="/photosSummary" className="nav-item nav-link">Photos Summary</NavLink>
                 <NavLink exact to="/feed" className="nav-item nav-link">Feed</NavLink>
                 <button className="btn btn-link nav-item nav-link" onClick={accountService.logout}>Logout</button>
                 <p className="nav-item nav-link">{process.env.REACT_APP_VERSION}</p>

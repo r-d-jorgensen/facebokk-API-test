@@ -5,6 +5,7 @@ import { Home } from 'home/Home';
 import { Login } from 'login/Login';
 import { Feed } from 'feed/Feed';
 import { Photos } from 'photos/Photos';
+import { PhotosSummary } from 'photos/PhotosSummary';
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/login" component={Login} />
                     <Route path="/feed" component={Feed} />
                     <Route path="/photos" component={Photos} />
+                    <Route path="/photosSummary" component={PhotosSummary} />
                     <Redirect from="*" to="/" />
                 </Switch>
             </div>

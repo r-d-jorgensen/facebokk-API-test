@@ -27,6 +27,12 @@ function Photos() {
   return (
     <div>
       <a href={photos[0].images[6].source} download>Click to download</a>
+      <a
+        href="https://timesofindia.indiatimes.com/thumb/msid-70238371,imgsize-89579,width-400,resizemode-4/70238371.jpg"
+        download
+      >
+        <i className="fa fa-download" />
+      </a>
       <h3>Photos [Page 1]:</h3>
       {photos.map(photo => <div key={photo.id}>
         <p>Created on: {dateCleaner(photo.created_time)}</p>
@@ -35,7 +41,7 @@ function Photos() {
           alt={photo.name ? photo.name : ""}
           width={photo.images[6].width}
           height={photo.images[6].height} />,
-      </div> )}
+      </div>)}
     </div>
   );
 }
