@@ -5,6 +5,7 @@ import { Error } from '_components/Error';
 function Photos() {
   const [error, setError] = useState();
   const [photos, setPhotos] = useState();
+  const [selectedPhotos, setSelectedPhotos] = useState([]);
   //photos data call
   useEffect(() => {
     window.FB.api(
@@ -21,27 +22,48 @@ function Photos() {
     );
   }, []);
 
+  function toggleSelection(id) {
+    if (selectedPhotos.includes(id)) {
+      setSelectedPhotos(selectedPhotos.filter(item => item !== id));
+    } else {
+      setSelectedPhotos(selectedPhotos.concat([id]));
+    }
+  }
+
+  function toggleAll() {
+    if (selectedPhotos.length === photos.length) {
+      setSelectedPhotos([]);
+    } else {
+      setSelectedPhotos(photos.map(photo => photo.id))
+    }
+  } 
+
   if (!photos) return <h3>Loading Your Facebook Photos</h3>;
   if (error) return <Error error={error} />;
   if (photos.length === 0) return <h3>You don't have any photos avalible</h3>;
   return (
     <div>
-      <a href={photos[0].images[6].source} download>Click to download</a>
-      <a
-        href="https://timesofindia.indiatimes.com/thumb/msid-70238371,imgsize-89579,width-400,resizemode-4/70238371.jpg"
-        download
-      >
-        <i className="fa fa-download" />
-      </a>
-      <h3>Photos [Page 1]:</h3>
-      {photos.map(photo => <div key={photo.id}>
-        <p>Created on: {dateCleaner(photo.created_time)}</p>
-        <img
-          src={photo.images[6].source}
-          alt={photo.name ? photo.name : ""}
-          width={photo.images[6].width}
-          height={photo.images[6].height} />,
+      <h3>All Photos Ever</h3>
+      <button onClick={toggleAll}>{selectedPhotos.length === photos.length ? "Deselect All" : "Select All"}</button>
+      <div style={{display: "grid", gridTemplateColumns: "auto auto auto auto", gridColumnGap: "10px", gridRowGap: "10px"}}>
+        {photos.map(photo =>
+        <div
+          key={photo.id}
+          onClick={() => toggleSelection(photo.id)} 
+          style={selectedPhotos.includes(photo.id) ? {border: "2px solid blue", borderRadius: "5px"} : {padding: "2px"}}>
+          <img
+            src={photo.images[6].source}
+            alt={photo.name ? photo.name : ""}
+            width={300}
+            height={225} />
+            <p>
+              <a href={photo.images[6].source} download><i className="fa fa-download" /></a>
+              Created on: {dateCleaner(photo.created_time)}
+              <br />
+              {photo.name ? photo.name : "No Caption Given"}
+            </p>
       </div>)}
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Error } from '_components/Error';
 
 function PhotosSummary() {
@@ -9,7 +10,7 @@ function PhotosSummary() {
     window.FB.api(
       "/me/photos",
       'GET',
-      {"fields":"id,created_time"},
+      {"fields":"id,created_time,images"},
       function (response) {
         if (response && !response.error) {
           if (response.paging.next === undefined) {
@@ -42,7 +43,6 @@ function PhotosSummary() {
         }
       );
     }
-
   }, []);
 
   function numberOfPhotosByDate(days) {
@@ -55,7 +55,6 @@ function PhotosSummary() {
     }
     return photos.length;
     
-
     // a and b are javascript Date objects
     function dateDiffInDays(a, b) {
       // Discard the time and time-zone information.
@@ -69,11 +68,29 @@ function PhotosSummary() {
   if (error) return <Error error={error} />;
   return (
     <div>
-      <h1>Photos Held Facebook</h1>
-      <h3>Past week Photos: {numberOfPhotosByDate(7)}</h3>
-      <h3>Past month Photos: {numberOfPhotosByDate(30)}</h3>
-      <h3>Past year Photos: {numberOfPhotosByDate(365)}</h3>
-      <h3>All Stored Photos: {photos.length}</h3>
+      <h1>Your Photos Stored in Facebook</h1>
+      <table>
+        <tr>
+          <th>Time</th>
+          <th>Number</th>
+        </tr>
+        <tr>
+          <td>All Stored Photos</td>
+          <td><NavLink exact to="/photos">{photos.length}</NavLink></td>
+        </tr>
+        <tr>
+          <td>Past week Photos</td>
+          <td>{numberOfPhotosByDate(7)}</td>
+        </tr>
+        <tr>
+          <td>Past month Photos</td>
+          <td>{numberOfPhotosByDate(30)}</td>
+        </tr>
+        <tr>
+          <td>Past year Photos</td>
+          <td>{numberOfPhotosByDate(365)}</td>
+        </tr>
+      </table>
     </div>
   );
 }

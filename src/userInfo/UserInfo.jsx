@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Error } from '_components/Error';
 
-function Home() {
+function UserInfo() {
     const [error, setError] = useState();
     const [account, setAccount] = useState();
     ///account data call
@@ -25,11 +25,13 @@ function Home() {
     return (
         <div>
             <img src={account.picture.data.url} alt="" width={account.picture.data.width} height={account.picture.data.hight}></img>
-            <h3>Facebook ID: {account.id}</h3>
-            <h3>Facebook Name: {account.name}</h3>
-            <h3>Facebook Email: {account.email}</h3>
+            <p><br /></p>
+            <h3 style={{color: "red"}}>Facebook Name:</h3>
+            <h3>{account.name}</h3>
+            <h3 style={{color: "red"}}>Facebook Email:</h3>
+            <h3>{account.email}</h3>
         </div>
     );
 }
 
-export { Home };
+export { UserInfo };
