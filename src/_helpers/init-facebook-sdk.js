@@ -24,7 +24,6 @@ export function initFacebookSdk() {
                 }
             });
         };
-
         // load facebook sdk script
         (function (d, s, id) {
             var js, fjs = d.getElementsByTagName(s)[0];

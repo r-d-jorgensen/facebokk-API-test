@@ -38,12 +38,11 @@ export function fakeBackend() {
 
                 function authenticate() {
                     const { accessToken } = body();
-
                     axios.get(`https://graph.facebook.com/v8.0/me?access_token=${accessToken}`)
                         .then(response => {
                             const { data } = response;
                             if (data.error) return unauthorized(data.error.message);
-
+                            
                             let account = accounts.find(x => x.facebookId === data.id);
                             if (!account) {
                                 // create new account if first time logging in
@@ -61,7 +60,8 @@ export function fakeBackend() {
                                 ...account,
                                 token: generateJwtToken(account)
                             });
-                        });
+                        })
+                        .catch(reponse => console.log(new Error(reponse)));
                 }
     
                 function getAccounts() {
@@ -99,7 +99,6 @@ export function fakeBackend() {
                 }
 
                 // helper functions
-    
                 function ok(body) {
                     // wrap in timeout to simulate server api call
                     setTimeout(() => resolve({ status: 200, data: body }), 500);

@@ -1,59 +1,68 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Error } from '_components/Error';
+import { facebookAPICall } from '_helpers';
 
 function PhotosSummary() {
   const [error, setError] = useState();
-  const [photos, setPhotos] = useState([]);
-  //photos data call 
+  const [allPhotos, setAllPhotos] = useState([]);
+  const [allPosts, setAllPosts] = useState([]);
+  const [loadingPhotos, setLoadingPhotos] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  //find all photos in feed and photos sections
   useEffect(() => {
-    window.FB.api(
-      "/me/photos",
-      'GET',
-      {"fields":"id,created_time,images"},
-      function (response) {
-        if (response && !response.error) {
-          if (response.paging.next === undefined) {
-            setPhotos(response.data);
-          } else {
-            getAllPhotos(response.paging.next, response.data);
-          }
-        } else {
-          setError(response.error);
+    getAllPhotos();
+    getAllFeedPhotos();
+
+    //iteratively calls photo endpoint till no more
+    async function getAllPhotos() {
+      const feilds = {"fields":"id,created_time"}
+      let url = "/me/photos";
+      let photos = [];
+      while (true) {
+        const result = await facebookAPICall(url, feilds)
+          .then(result => result)
+          .catch(error => setError(error));
+        if (result.data.length !== 0) photos = photos.concat(result.data);
+        if (result.hasOwnProperty('paging')) url = result.paging.next;
+        else {
+          setAllPhotos(photos);
+          setLoadingPhotos(false)
+          return;
         }
       }
-    );
+    }
 
-    //call and set all the photos
-    function getAllPhotos(next, data) {
-      window.FB.api(
-        next,
-        'GET',
-        {},
-        function (response) {
-          if (response && !response.error) {
-            if (response.paging.next === undefined) {
-              setPhotos(data.concat(response.data));
-            } else {
-              getAllPhotos(response.paging.next, data.concat(response.data));
-            }
-          } else {
-            setError(response.error);
-          }
+    //iteratively calls feed endpoint till no more
+    //repetitive code should be combined with above
+    //this is hacked... needs to filter before data gets here waste of cycles
+    async function getAllFeedPhotos() {
+      const feilds = {"fields":"id,type,message,created_time,full_picture"}
+      let url = "/me/posts";
+      let posts = [];
+      while (true) {
+        const result = await facebookAPICall(url, feilds)
+          .then(result => result)
+          .catch(error => setError(error));
+        if (result.data.length !== 0) posts = posts.concat(result.data.filter(post => post.type === 'photo'));
+        if (result.hasOwnProperty('paging')) url = result.paging.next;
+        else {
+          setAllPosts(posts);
+          setLoadingPosts(false)
+          return;
         }
-      );
+      }
     }
   }, []);
 
-  function numberOfPhotosByDate(days) {
-    if (photos.length === 0) return 'Loading Photos';
+  function numberOfPhotosByDate(days, data) {
     const _MS_PER_DAY = 1000 * 60 * 60 * 24;
     const today = new Date();
-    for (let i = 0; i < photos.length; i++) {
-      if (dateDiffInDays(new Date(photos[i].created_time), today) >= days)
+    for (let i = 0; i < data.length; i++) {
+      if (dateDiffInDays(new Date(data[i].created_time), today) >= days)
         return i;
     }
-    return photos.length;
+    return data.length;
     
     // a and b are javascript Date objects
     function dateDiffInDays(a, b) {
@@ -70,26 +79,35 @@ function PhotosSummary() {
     <div>
       <h1>Your Photos Stored in Facebook</h1>
       <table>
-        <tr>
-          <th>Time</th>
-          <th>Number</th>
-        </tr>
-        <tr>
-          <td>All Stored Photos</td>
-          <td><NavLink exact to="/photos">{photos.length}</NavLink></td>
-        </tr>
-        <tr>
-          <td>Past week Photos</td>
-          <td>{numberOfPhotosByDate(7)}</td>
-        </tr>
-        <tr>
-          <td>Past month Photos</td>
-          <td>{numberOfPhotosByDate(30)}</td>
-        </tr>
-        <tr>
-          <td>Past year Photos</td>
-          <td>{numberOfPhotosByDate(365)}</td>
-        </tr>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Photos</th>
+            <th>Posts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>All Stored Photos</td>
+            <td><NavLink exact to="/photos">{loadingPhotos ? 'Loading Photos' : allPhotos.length}</NavLink></td>
+            <td><NavLink exact to="/photos">{loadingPosts ? 'Loading Posts' : allPosts.length}</NavLink></td>
+          </tr>
+          <tr>
+            <td>Past week Photos</td>
+            <td>{loadingPhotos ? 'Loading Photos' : numberOfPhotosByDate(7, allPhotos)}</td>
+            <td>{loadingPosts ? 'Loading Posts' : numberOfPhotosByDate(7, allPosts)}</td>
+          </tr>
+          <tr>
+            <td>Past month Photos</td>
+            <td>{loadingPhotos ? 'Loading Photos' : numberOfPhotosByDate(30, allPhotos)}</td>
+            <td>{loadingPosts ? 'Loading Posts' : numberOfPhotosByDate(30, allPosts)}</td>
+          </tr>
+          <tr>
+            <td>Past year Photos</td>
+            <td>{loadingPhotos ? 'Loading Photos' : numberOfPhotosByDate(365, allPhotos)}</td>
+            <td>{loadingPosts ? 'Loading Posts' : numberOfPhotosByDate(365, allPosts)}</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   );

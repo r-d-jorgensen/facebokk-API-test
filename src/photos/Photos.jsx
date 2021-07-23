@@ -56,12 +56,11 @@ function Photos() {
             alt={photo.name ? photo.name : ""}
             width={300}
             height={225} />
-            <p>
-              <a href={photo.images[6].source} download><i className="fa fa-download" /></a>
+            <div>
               Created on: {dateCleaner(photo.created_time)}
               <br />
               {photo.name ? photo.name : "No Caption Given"}
-            </p>
+            </div>
       </div>)}
       </div>
     </div>
