@@ -4,6 +4,7 @@ import { Nav, PrivateRoute } from '_components';
 import { UserInfo } from 'userInfo/UserInfo';
 import { Login } from 'login/Login';
 import { Photos } from 'photos/Photos';
+import { Posts } from 'photos/Posts';
 import { PhotosSummary } from 'photos/PhotosSummary';
 
 function App() {
@@ -14,7 +15,8 @@ function App() {
                 <Switch>
                     <Route exact path="/login" component={Login} />
                     <PrivateRoute exact path="/userInfo" component={UserInfo} />
-                    <PrivateRoute exact path="/photos" component={Photos} />
+                    <PrivateRoute path="/photos" component={Photos} />
+                    <PrivateRoute path="/posts" component={Posts} />
                     <PrivateRoute exact path="/" component={PhotosSummary} />
                     <Redirect from="*" to="/" />
                 </Switch>

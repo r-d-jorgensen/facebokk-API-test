@@ -89,8 +89,8 @@ function PhotosSummary() {
         <tbody>
           <tr>
             <td>All Stored Photos</td>
-            <td><NavLink exact to="/photos">{loadingPhotos ? 'Loading Photos' : allPhotos.length}</NavLink></td>
-            <td><NavLink exact to="/photos">{loadingPosts ? 'Loading Posts' : allPosts.length}</NavLink></td>
+            <td><NavLink to="/photos">{loadingPhotos ? 'Loading Photos' : allPhotos.length}</NavLink></td>
+            <td><NavLink to="/posts">{loadingPosts ? 'Loading Posts' : allPosts.length}</NavLink></td>
           </tr>
           <tr>
             <td>Past week Photos</td>
