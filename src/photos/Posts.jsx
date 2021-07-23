@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { dateCleaner, facebookAPICall } from '_helpers';
 import { Error } from '_components/Error';
 
+//HACK... fix when refactor
+//this entire page should be refactored with the Photos page into one component or they should do diffrent things
 function Posts() {
   const [error, setError] = useState();
   const [posts, setPosts] = useState();
@@ -13,7 +15,7 @@ function Posts() {
     getAllFeedPhotos();
     //iteratively calls feed endpoint till no more
     //repetitive code should be combined with above
-    //this is hacked... needs to filter before data gets here waste of cycles
+    //HACK.... needs to filter before data gets here waste of cycles
     async function getAllFeedPhotos() {
       const feilds = {"fields":"id,type,message,created_time,full_picture"}
       let url = "/me/posts";
