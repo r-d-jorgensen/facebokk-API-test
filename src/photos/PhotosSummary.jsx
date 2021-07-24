@@ -16,13 +16,17 @@ function PhotosSummary() {
 
     //iteratively calls photo endpoint till no more
     async function getAllPhotos() {
-      const feilds = {"fields":"id,created_time"}
+      const fields = {"fields":"id,created_time"}
       let url = "/me/photos";
       let photos = [];
       while (true) {
-        const result = await facebookAPICall(url, feilds)
+        const result = await facebookAPICall(url, fields)
           .then(result => result)
-          .catch(error => setError(error));
+          .catch(error => {setError(error)});
+        if (!result) {
+          setError("Facebook Returned Bad Data.");
+          return;
+        }
         if (result.data.length !== 0) photos = photos.concat(result.data);
         if (result.hasOwnProperty('paging')) url = result.paging.next;
         else {
@@ -37,17 +41,16 @@ function PhotosSummary() {
     //iteratively calls feed endpoint till no more
     //HACK... needs to filter before data gets here waste of cycles
     async function getAllFeedPhotos() {
-      const feilds = {"fields":"id,type,message,created_time,full_picture"}
+      const fields = {"fields":"id,type,message,created_time,full_picture"}
       let url = "/me/posts";
       let posts = [];
       while (true) {
-        const result = await facebookAPICall(url, feilds)
+        const result = await facebookAPICall(url, fields)
           .then(result => result)
           .catch(error => setError(error));
         if (result.data.length !== 0) posts = posts.concat(result.data.filter(post => post.type === 'photo'));
         if (result.hasOwnProperty('paging')) url = result.paging.next;
         else {
-          console.log(posts)
           window.sessionStorage.setItem("posts", JSON.stringify(posts));
           setAllPosts(posts);
           setLoadingPosts(false)
