@@ -27,15 +27,15 @@ function PhotosSummary() {
         if (result.hasOwnProperty('paging')) url = result.paging.next;
         else {
           setAllPhotos(photos);
-          setLoadingPhotos(false)
+          window.sessionStorage.setItem("photos", JSON.stringify(photos));
+          setLoadingPhotos(false);
           return;
         }
       }
     }
 
     //iteratively calls feed endpoint till no more
-    //repetitive code should be combined with above
-    //this is hacked... needs to filter before data gets here waste of cycles
+    //HACK... needs to filter before data gets here waste of cycles
     async function getAllFeedPhotos() {
       const feilds = {"fields":"id,type,message,created_time,full_picture"}
       let url = "/me/posts";
@@ -47,6 +47,8 @@ function PhotosSummary() {
         if (result.data.length !== 0) posts = posts.concat(result.data.filter(post => post.type === 'photo'));
         if (result.hasOwnProperty('paging')) url = result.paging.next;
         else {
+          console.log(posts)
+          window.sessionStorage.setItem("posts", JSON.stringify(posts));
           setAllPosts(posts);
           setLoadingPosts(false)
           return;

@@ -1,25 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { dateCleaner } from '_helpers';
-import { Error } from '_components/Error';
 
 function Photos() {
-  const [error, setError] = useState();
   const [photos, setPhotos] = useState();
   const [selectedPhotos, setSelectedPhotos] = useState([]);
-  //photos data call
+  
   useEffect(() => {
-    window.FB.api(
-      "/me/photos",
-      'GET',
-      {"fields":"id,name,created_time,images"},
-      function (response) {
-        if (response && !response.error) {
-          setPhotos(response.data);
-        } else {
-          setError(response.error);
-        }
-      }
-    );
+    //should have some error checking here
+    setPhotos(JSON.parse(window.sessionStorage.getItem("photos")));
   }, []);
 
   function toggleSelection(id) {
@@ -39,7 +27,6 @@ function Photos() {
   } 
 
   if (!photos) return <h3>Loading Your Facebook Photos</h3>;
-  if (error) return <Error error={error} />;
   if (photos.length === 0) return <h3>You don't have any photos avalible</h3>;
   return (
     <div>
