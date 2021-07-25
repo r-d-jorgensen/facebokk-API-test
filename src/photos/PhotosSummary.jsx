@@ -12,7 +12,7 @@ function PhotosSummary() {
   //find all photos in feed and photos sections
   useEffect(() => {
     getAllPhotos();
-    getAllFeedPhotos();
+    //getAllFeedPhotos();
 
     //iteratively calls photo endpoint till no more
     async function getAllPhotos() {
@@ -22,13 +22,13 @@ function PhotosSummary() {
       while (true) {
         const result = await facebookAPICall(url, fields)
           .then(result => result)
-          .catch(error => {setError(error)});
+          .catch(error => setError(error));
         if (!result) {
           setError("Facebook Returned Bad Data.");
           return;
         }
         if (result.data.length !== 0) photos = photos.concat(result.data);
-        if (result.hasOwnProperty('paging')) url = result.paging.next;
+        if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
           setAllPhotos(photos);
           window.sessionStorage.setItem("photos", JSON.stringify(photos));
@@ -49,7 +49,7 @@ function PhotosSummary() {
           .then(result => result)
           .catch(error => setError(error));
         if (result.data.length !== 0) posts = posts.concat(result.data.filter(post => post.type === 'photo'));
-        if (result.hasOwnProperty('paging')) url = result.paging.next;
+        if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
           window.sessionStorage.setItem("posts", JSON.stringify(posts));
           setAllPosts(posts);
