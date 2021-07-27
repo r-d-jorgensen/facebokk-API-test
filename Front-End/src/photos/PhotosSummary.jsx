@@ -12,11 +12,11 @@ function PhotosSummary() {
   //find all photos in feed and photos sections
   useEffect(() => {
     getAllPhotos();
-    //getAllFeedPhotos();
+    getAllFeedPhotos();
 
     //iteratively calls photo endpoint till no more
     async function getAllPhotos() {
-      const fields = {"fields":"id,created_time"}
+      const fields = {"fields":"id,created_time,images"}
       let url = "/me/photos";
       let photos = [];
       while (true) {
@@ -44,7 +44,10 @@ function PhotosSummary() {
       const fields = {"fields":"id,type,message,created_time,full_picture"}
       let url = "/me/posts";
       let posts = [];
-      while (true) {
+      //to limit the number of call temperaraly
+      let i = 0;
+      while (i < 3) {
+        i += 1;
         const result = await facebookAPICall(url, fields)
           .then(result => result)
           .catch(error => setError(error));
@@ -53,10 +56,13 @@ function PhotosSummary() {
         else {
           window.sessionStorage.setItem("posts", JSON.stringify(posts));
           setAllPosts(posts);
-          setLoadingPosts(false)
+          setLoadingPosts(false);
           return;
         }
       }
+      window.sessionStorage.setItem("posts", JSON.stringify(posts));
+      setAllPosts(posts);
+      setLoadingPosts(false);
     }
   }, []);
 
