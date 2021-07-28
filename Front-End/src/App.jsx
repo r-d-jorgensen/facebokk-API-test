@@ -6,6 +6,8 @@ import { Login } from 'login/Login';
 import { Photos } from 'photos/Photos';
 import { Posts } from 'photos/Posts';
 import { PhotosSummary } from 'photos/PhotosSummary';
+import { Home } from 'home/Home';
+
 
 function App() {
     return (
@@ -17,7 +19,8 @@ function App() {
                     <PrivateRoute exact path="/userInfo" component={UserInfo} />
                     <PrivateRoute path="/photos" component={Photos} />
                     <PrivateRoute path="/posts" component={Posts} />
-                    <PrivateRoute exact path="/" component={PhotosSummary} />
+                    <PrivateRoute exact path="/photosSummary" component={PhotosSummary} />
+                    <PrivateRoute exact path="/" component={Home} />
                     <Redirect from="*" to="/" />
                 </Switch>
             </div>
