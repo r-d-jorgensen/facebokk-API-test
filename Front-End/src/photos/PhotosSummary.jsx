@@ -51,7 +51,7 @@ function PhotosSummary() {
         const result = await facebookAPICall(url, fields)
           .then(result => result)
           .catch(error => setError(error));
-        if (result.data.length !== 0) posts = posts.concat(result.data.filter(post => post.type === 'photo'));
+        if (result.hasOwnProperty('data') && result.data.length !== 0) posts = posts.concat(result.data.filter(post => post.type === 'photo'));
         if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
           window.sessionStorage.setItem("posts", JSON.stringify(posts));
