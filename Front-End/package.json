@@ -1,15 +1,15 @@
 {
-    "name": "react-facebook-login-example",
-    "version": "0.7.5",
+    "name": "data-movers-webpage",
+    "version": "0.8.0",
     "dependencies": {
-        "axios": "^0.20.0",
+        "axios": "^0.21.1",
         "history": "^4.10.1",
-        "react": "^17.0.0",
-        "react-dom": "^17.0.0",
-        "react-hook-form": "^6.9.5",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-hook-form": "^6.15.8",
         "react-router-dom": "^5.2.0",
         "react-scripts": "3.4.4",
-        "rxjs": "^6.6.3"
+        "rxjs": "^6.6.7"
     },
     "scripts": {
         "start": "react-scripts start",

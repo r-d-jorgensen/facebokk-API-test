@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Error } from '_components/Error';
@@ -11,8 +12,13 @@ function PhotosSummary() {
   const [loadingPosts, setLoadingPosts] = useState(true);
   //find all photos in feed and photos sections
   useEffect(() => {
-    getAllPhotos();
-    getAllFeedPhotos();
+    getAllPhotos(); 
+    //getAllFeedPhotos();
+    apiCall();
+    async function apiCall() {
+      const data = await axios.get(`https://localhost:8080/api/photos`);
+      console.log(data);
+    }
 
     //iteratively calls photo endpoint till no more
     async function getAllPhotos() {
