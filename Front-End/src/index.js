@@ -8,10 +8,6 @@ import './index.css';
 import { initFacebookSdk, history } from './_helpers';
 import { App } from './App';
 
-// setup fake backend
-import { fakeBackend } from './_helpers';
-fakeBackend();
-
 // wait for facebook sdk before startup
 initFacebookSdk().then(startApp);
 

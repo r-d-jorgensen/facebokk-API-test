@@ -1,11 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
-import axios from 'axios';
-
 import { history } from '_helpers';
 
-const baseUrl = `${process.env.NODE_ENV === "development"
-                    ? process.env.REACT_APP_FACEBOOK_APP_ID_DEV
-                    : process.env.REACT_APP_FACEBOOK_APP_ID}/accounts`;
 const accountSubject = new BehaviorSubject(null);
 
 export const accountService = {
@@ -30,11 +25,13 @@ async function login() {
     history.push(from);
 }
 
+// HACK... this is used to simulate calling the server to auth the user
 async function apiAuthenticate(accessToken) {
-    // authenticate with the api using a facebook access token,
-    // on success the api returns an account object with a JWT auth token
-    const response = await axios.post(`${baseUrl}/authenticate`, { accessToken });
-    const account = response.data;
+    const tokenPayload = { 
+        exp: Math.round(new Date(Date.now() + 15*60*1000).getTime() / 1000),
+        id: accessToken,
+    };
+    const account = { token: `fake-jwt-token.${btoa(JSON.stringify(tokenPayload))}` };
     accountSubject.next(account);
     startAuthenticateTimer();
     return account;
