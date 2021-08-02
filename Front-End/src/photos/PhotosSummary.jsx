@@ -13,11 +13,13 @@ function PhotosSummary() {
   //find all photos in feed and photos sections
   useEffect(() => {
     getAllPhotos(); 
-    //getAllFeedPhotos();
+    getAllFeedPhotos();
     apiCall();
     async function apiCall() {
-      const data = await axios.get(`https://localhost:8080/api/photos`);
-      console.log(data);
+      const photos = await axios.get(`https://localhost:8080/photos`);
+      console.log(photos);
+      const posts = await axios.get(`https://localhost:8080/posts`);
+      console.log(posts);
     }
 
     //iteratively calls photo endpoint till no more
