@@ -5,6 +5,7 @@ import { dateCleaner } from '_helpers';
 //this entire page should be refactored with the Photos page into one component or they should do diffrent things
 function Posts() {
   const [posts, setPosts] = useState();
+  const [showMessage, setShowMessage] = useState(false);
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [displayType, setDisplayType] = useState(1); //should have ENUM
   const displayTypes = [
@@ -39,6 +40,7 @@ function Posts() {
     setDisplayType(e.target.value);
   }
 
+  console.log(showMessage);
   if (!posts) return <h3>Loading Your Facebook Posts</h3>;
   if (posts.length === 0) return <h3>You don't have any posts avalible</h3>;
   return (
@@ -48,6 +50,7 @@ function Posts() {
       <button value={2} onClick={toggleSizes}>Small</button>
       <button value={1} onClick={toggleSizes}>Medium</button>
       <button value={0} onClick={toggleSizes}>Large</button>
+      <button onClick={() => {setShowMessage(showMessage ? false : true )}}>{showMessage ? "Hide Messages" : "Show Messages"}</button>
       <div style={{display: "grid", gridTemplateColumns: displayTypes[displayType].collumns, gridColumnGap: "10px", gridRowGap: "10px"}}>
         {posts.map(post =>
         <div
@@ -62,7 +65,7 @@ function Posts() {
             <div>
               Created on: {dateCleaner(post.created_time)}
               <br />
-              {post.message ? post.message : "No Message Given"}
+              {showMessage ? (post.message ? post.message : "No Message Given") : null}
             </div>
       </div>)}
       </div>
