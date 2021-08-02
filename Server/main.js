@@ -11,13 +11,6 @@ const { postData } = require('./rawPostData');
 const app = express();
 app.use(cors());
 
-const sslServer = https.createServer({
-  key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
-}, app);
-
-sslServer.listen(API_PORT, () => console.log(`Secure server on port ${API_PORT}...`))
-
 app.get('/photos', (req, res, next) => {
   res.send(photoData);
 });
@@ -25,3 +18,10 @@ app.get('/photos', (req, res, next) => {
 app.get('/posts', (req, res, next) => {
   res.send(postData);
 });
+
+const sslServer = https.createServer({
+  key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
+}, app);
+
+sslServer.listen(API_PORT, () => console.log(`Secure server on port ${API_PORT}...`));
