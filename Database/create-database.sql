@@ -7,61 +7,49 @@ SET character_set_client = utf8mb4 ;
 
 /*
 origination_type should be in ENUM
-date should be in DATE Form
+Foreign Keys should have constraints
 */
-CREATE TABLE `users` (
-  `userID` int NOT NULL AUTO_INCREMENT,
-  `facebookID` int,
-  `name` varchar(50) NOT NULL,
-  `email` varchar(50) NOT NULL,
-  PRIMARY KEY (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE users (
+    `userID` INT NOT NULL AUTO_INCREMENT,
+    `facebookID` INT,
+    `name` VARCHAR(50) NOT NULL,
+    `email` VARCHAR(50) NOT NULL,
+    PRIMARY KEY (`userID`)
+)  ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=UTF8MB4 COLLATE = UTF8MB4_0900_AI_CI;
 
-CREATE TABLE `syncs` (
+CREATE TABLE syncs (
   `syncID` int NOT NULL AUTO_INCREMENT,
-  `userID` int,
+  `userID` int NOT NULL,
   `originationType` varchar(50) NOT NULL,
   `date` varchar(50) NOT NULL,
-  PRIMARY KEY (`syncID`),
-  KEY `FK_userID` (`userID`),
-  CONSTRAINT `FK_userID` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON UPDATE CASCADE
+  PRIMARY KEY (`syncID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `images` (
+CREATE TABLE images (
   `imageID` int NOT NULL AUTO_INCREMENT,
   `userID` int NOT NULL,
   `src_link` varchar(150) NOT NULL,
   `width` tinyint NOT NULL,
   `height` tinyint NOT NULL,
-  PRIMARY KEY (`imageID`),
-  KEY `FK_userID` (`userID`),
-  CONSTRAINT `FK_userID` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON UPDATE CASCADE
+  PRIMARY KEY (`imageID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `posts` (
+CREATE TABLE posts (
   `post_id` int NOT NULL AUTO_INCREMENT,
   `userID` int NOT NULL,
   `imageID` varchar(50) NOT NULL,
   `origination_type` varchar(50) NOT NULL,
-  `date_created` varchar(50) NOT NULL,
-  `message` varchar(500) NOT NULL,
-  PRIMARY KEY (`post_id`),
-  KEY `FK_userID` (`userID`),
-  KEY `FK_imageID` (`imageID`),
-  CONSTRAINT `FK_userID` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON UPDATE CASCADE,
-  CONSTRAINT `FK_imageID` FOREIGN KEY (`imageID`) REFERENCES `images` (`imageID`) ON UPDATE CASCADE
+  `date_created` DATE NOT NULL,
+  `message` varchar(500),
+  PRIMARY KEY (`post_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `photos` (
+CREATE TABLE photos (
   `photosID` int NOT NULL AUTO_INCREMENT,
   `userID` int NOT NULL,
   `imageID` varchar(50) NOT NULL,
   `origination_type` varchar(50) NOT NULL,
-  `date_created` varchar(50) NOT NULL,
-  `caption` varchar(500) NOT NULL,
-  PRIMARY KEY (`photosID`),
-  KEY `FK_userID` (`userID`),
-  KEY `FK_imageID` (`imageID`),
-  CONSTRAINT `FK_userID` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON UPDATE CASCADE,
-  CONSTRAINT `FK_imageID` FOREIGN KEY (`imageID`) REFERENCES `images` (`imageID`) ON UPDATE CASCADE
+  `date_created` DATE NOT NULL,
+  `caption` varchar(500),
+  PRIMARY KEY (`photosID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
