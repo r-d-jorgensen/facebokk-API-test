@@ -10,46 +10,47 @@ origination_type should be in ENUM
 Foreign Keys should have constraints
 */
 CREATE TABLE users (
-    `userID` INT NOT NULL AUTO_INCREMENT,
-    `facebookID` INT,
-    `name` VARCHAR(50) NOT NULL,
-    `email` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`userID`)
+    user_id INT NOT NULL AUTO_INCREMENT,
+    facebook_id INT,
+    username VARCHAR(50) NOT NULL,
+    user_password VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    PRIMARY KEY (user_id)
 )  ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=UTF8MB4 COLLATE = UTF8MB4_0900_AI_CI;
 
 CREATE TABLE syncs (
-  `syncID` int NOT NULL AUTO_INCREMENT,
-  `userID` int NOT NULL,
-  `originationType` varchar(50) NOT NULL,
-  `date` varchar(50) NOT NULL,
-  PRIMARY KEY (`syncID`)
+  sync_id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  origination_type VARCHAR(50) NOT NULL,
+  sync_date VARCHAR(50) NOT NULL,
+  PRIMARY KEY (sync_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE images (
-  `imageID` int NOT NULL AUTO_INCREMENT,
-  `userID` int NOT NULL,
-  `src_link` varchar(150) NOT NULL,
-  `width` tinyint NOT NULL,
-  `height` tinyint NOT NULL,
-  PRIMARY KEY (`imageID`)
+  image_id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  src_link VARCHAR(150) NOT NULL,
+  width TINYINT NOT NULL,
+  height TINYINT NOT NULL,
+  PRIMARY KEY (image_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE posts (
-  `post_id` int NOT NULL AUTO_INCREMENT,
-  `userID` int NOT NULL,
-  `imageID` varchar(50) NOT NULL,
-  `origination_type` varchar(50) NOT NULL,
-  `date_created` DATE NOT NULL,
-  `message` varchar(500),
-  PRIMARY KEY (`post_id`)
+  post_id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  image_id VARCHAR(50) NOT NULL,
+  origination_type VARCHAR(50) NOT NULL,
+  date_created DATE NOT NULL,
+  message VARCHAR(500),
+  PRIMARY KEY (post_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE photos (
-  `photosID` int NOT NULL AUTO_INCREMENT,
-  `userID` int NOT NULL,
-  `imageID` varchar(50) NOT NULL,
-  `origination_type` varchar(50) NOT NULL,
-  `date_created` DATE NOT NULL,
-  `caption` varchar(500),
-  PRIMARY KEY (`photosID`)
+  photos_id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  image_id INT NOT NULL,
+  origination_type VARCHAR(50) NOT NULL,
+  date_created DATE NOT NULL,
+  caption VARCHAR(500),
+  PRIMARY KEY (photos_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
