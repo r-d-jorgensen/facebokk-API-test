@@ -1,56 +1,62 @@
-DROP DATABASE IF EXISTS `data_movers`;
-CREATE DATABASE `data_movers`; 
-USE `data_movers`;
+-- version 0.2.0
+drop database if exists `user_db`;
+create database `user_db`; 
+use `user_db`;
 
-SET NAMES utf8mb4 ;
-SET character_set_client = utf8mb4 ;
+set names utf8mb4 ;
+set character_set_client = utf8mb4 ;
 
 /*
 origination_type should be in ENUM
 Foreign Keys should have constraints
 */
-CREATE TABLE users (
-    user_id INT NOT NULL AUTO_INCREMENT,
-    facebook_id INT,
-    username VARCHAR(50) NOT NULL,
-    user_password VARCHAR(50) NOT NULL,
-    email VARCHAR(50) NOT NULL,
-    PRIMARY KEY (user_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=UTF8MB4 COLLATE = UTF8MB4_0900_AI_CI;
+create table users (
+    user_id int not null auto_increment,
+    facebook_id int,
+    username varchar(50) not null,
+    user_password varchar(50) not null,
+    email varchar(50) not null,
+    primary key (user_id)
+)  engine=innodb auto_increment=1 default charset=utf8mb4 collate = utf8mb4_0900_ai_ci;
 
-CREATE TABLE syncs (
-  sync_id INT NOT NULL AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  origination_type VARCHAR(50) NOT NULL,
-  sync_date VARCHAR(50) NOT NULL,
-  PRIMARY KEY (sync_id)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+create table origin_ENUM (
+    origin_type varchar(50) not null,
+    primary key (origin_type)
+)  engine=innodb auto_increment=1 default charset=utf8mb4 collate = utf8mb4_0900_ai_ci;
 
-CREATE TABLE images (
-  image_id INT NOT NULL AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  src_link VARCHAR(150) NOT NULL,
-  width TINYINT NOT NULL,
-  height TINYINT NOT NULL,
-  PRIMARY KEY (image_id)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+create table syncs (
+  sync_id int not null auto_increment,
+  user_id int not null,
+  origin_type varchar(50) not null,
+  sync_date varchar(50) not null,
+  primary key (sync_id)
+) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
 
-CREATE TABLE posts (
-  post_id INT NOT NULL AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  image_id VARCHAR(50) NOT NULL,
-  origination_type VARCHAR(50) NOT NULL,
-  date_created DATE NOT NULL,
-  message VARCHAR(500),
-  PRIMARY KEY (post_id)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+create table images (
+  image_id int not null auto_increment,
+  user_id int not null,
+  src_link varchar(150) not null,
+  width smallint not null,
+  height smallint not null,
+  primary key (image_id)
+) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
 
-CREATE TABLE photos (
-  photos_id INT NOT NULL AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  image_id INT NOT NULL,
-  origination_type VARCHAR(50) NOT NULL,
-  date_created DATE NOT NULL,
-  caption VARCHAR(500),
-  PRIMARY KEY (photos_id)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+create table posts (
+  post_id int not null auto_increment,
+  user_id int not null,
+  image_id varchar(50) not null,
+  origin_type varchar(50) not null,
+  date_created date not null,
+  message varchar(500),
+  primary key (post_id)
+) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
+
+create table photos (
+  photos_id int not null auto_increment,
+  user_id int not null,
+  image_id int not null,
+  origin_type varchar(50) not null,
+  date_created date not null,
+  caption varchar(500),
+  primary key (photos_id)
+) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
