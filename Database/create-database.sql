@@ -6,10 +6,6 @@ use `user_db`;
 set names utf8mb4 ;
 set character_set_client = utf8mb4 ;
 
-/*
-origination_type should be in ENUM
-Foreign Keys should have constraints
-*/
 create table users (
     user_id int not null auto_increment,
     facebook_id int,
@@ -29,7 +25,9 @@ create table syncs (
   user_id int not null,
   origin_type varchar(50) not null,
   sync_date varchar(50) not null,
-  primary key (sync_id)
+  primary key (sync_id),
+  foreign key (user_id) references users(user_id) on delete cascade,
+  foreign key (origin_type) references origin_ENUM(origin_type)
 ) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
 
 create table images (
@@ -38,17 +36,21 @@ create table images (
   src_link varchar(150) not null,
   width smallint not null,
   height smallint not null,
-  primary key (image_id)
+  primary key (image_id),
+  foreign key (user_id) references users(user_id) on delete cascade
 ) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
 
 create table posts (
   post_id int not null auto_increment,
   user_id int not null,
-  image_id varchar(50) not null,
+  image_id int not null,
   origin_type varchar(50) not null,
   date_created date not null,
   message varchar(500),
-  primary key (post_id)
+  primary key (post_id),
+  foreign key (user_id) references users(user_id) on delete cascade,
+  foreign key (image_id) references images(image_id ) on delete cascade,
+  foreign key (origin_type) references origin_ENUM(origin_type)
 ) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
 
 create table photos (
@@ -58,5 +60,8 @@ create table photos (
   origin_type varchar(50) not null,
   date_created date not null,
   caption varchar(500),
-  primary key (photos_id)
+  primary key (photos_id),
+  foreign key (user_id) references users(user_id) on delete cascade,
+  foreign key (image_id) references images(image_id) on delete cascade,
+  foreign key (origin_type) references origin_ENUM(origin_type)
 ) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
