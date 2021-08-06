@@ -24,7 +24,8 @@ create table syncs (
   sync_id int not null auto_increment,
   user_id int not null,
   origin_type varchar(50) not null,
-  sync_date varchar(50) not null,
+  sync_date datetime not null,
+  was_completed boolean not null,
   primary key (sync_id),
   foreign key (user_id) references users(user_id) on delete cascade,
   foreign key (origin_type) references origin_ENUM(origin_type)
