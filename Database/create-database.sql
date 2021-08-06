@@ -1,10 +1,10 @@
 -- version 0.2.0
 drop database if exists `user_db`;
-create database `user_db`; 
+create database `user_db`;
 use `user_db`;
 
-set names utf8mb4 ;
-set character_set_client = utf8mb4 ;
+set names utf8mb4;
+set character_set_client = utf8mb4;
 
 create table users (
     user_id int not null auto_increment,
