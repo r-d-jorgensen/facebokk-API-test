@@ -16,9 +16,9 @@ function PhotosSummary() {
     getAllFeedPhotos();
     apiCall();
     async function apiCall() {
-      const photos = await axios.get(`https://localhost:8080/photos`);
+      const photos = await axios.get(`https://localhost:8080/facebook/photos`);
       console.log(photos);
-      const posts = await axios.get(`https://localhost:8080/posts`);
+      const posts = await axios.get(`https://localhost:8080/facebook/posts`);
       console.log(posts);
     }
 

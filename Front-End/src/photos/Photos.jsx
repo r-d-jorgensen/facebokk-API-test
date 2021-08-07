@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { dateCleaner } from '_helpers';
 
 function Photos() {
@@ -7,6 +8,7 @@ function Photos() {
   
   useEffect(() => {
     //should have some error checking here
+    //should be using a get call to server here
     setPhotos(JSON.parse(window.sessionStorage.getItem("photos")));
   }, []);
 
@@ -24,7 +26,12 @@ function Photos() {
     } else {
       setSelectedPhotos(photos.map(photo => photo.id))
     }
-  } 
+  }
+
+  function sendData() {
+    console.log('sent data')
+    axios.post(`https://localhost:8080/facebook/photos`, {data: photos});
+  }
 
   if (!photos) return <h3>Loading Your Facebook Photos</h3>;
   if (photos.length === 0) return <h3>You don't have any photos avalible</h3>;
@@ -32,6 +39,7 @@ function Photos() {
     <div>
       <h3>All Photos Ever</h3>
       <button onClick={toggleAll}>{selectedPhotos.length === photos.length ? "Deselect All" : "Select All"}</button>
+      <button onClick={sendData}>Sync</button>
       <div style={{display: "grid", gridTemplateColumns: "auto auto auto auto", gridColumnGap: "10px", gridRowGap: "10px"}}>
         {photos.map(photo =>
         <div
