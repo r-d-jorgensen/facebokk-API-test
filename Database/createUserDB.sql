@@ -1,7 +1,7 @@
--- version 0.3.0
-drop database if exists `user_db`;
-create database `user_db`;
-use `user_db`;
+-- version 0.3.1
+drop database if exists user_db;
+create database user_db;
+use user_db;
 
 set names utf8mb4;
 set character_set_client = utf8mb4;
@@ -16,19 +16,19 @@ create table users (
 )  engine=innodb auto_increment=1 default charset=utf8mb4 collate = utf8mb4_0900_ai_ci;
 
 create table origin_ENUM (
-		origin_ENUM_id int not null,
+		origin_ENUM_id int not null auto_increment,
     origin_type varchar(50) not null,
     primary key (origin_ENUM_id)
 )  engine=innodb auto_increment=1 default charset=utf8mb4 collate = utf8mb4_0900_ai_ci;
-insert into origin_EMUM values (default, facebook);
+insert into origin_ENUM values (default, 'facebook');
 
-create table structure_Type_ENUM (
-		structure_type_ENUM_id int not null,
+create table structure_type_ENUM (
+		structure_type_ENUM_id int not null auto_increment,
     structure_type varchar(50) not null,
     primary key (structure_type_ENUM_id)
 )  engine=innodb auto_increment=1 default charset=utf8mb4 collate = utf8mb4_0900_ai_ci;
-insert into structure_Type_ENUM values (default, post);
-insert into structure_Type_ENUM values (default, photo);
+insert into structure_type_ENUM values (default, 'post');
+insert into structure_type_ENUM values (default, 'photo');
 
 create table syncs (
   sync_id int not null auto_increment,
@@ -40,7 +40,7 @@ create table syncs (
   primary key (sync_id),
   foreign key (user_id) references users(user_id) on delete cascade,
   foreign key (origin_ENUM_id) references origin_ENUM(origin_ENUM_id),
-  foreign key (structure_type_ENUM_id) references structure_Type_ENUM(structure_type_ENUM_id)
+  foreign key (structure_type_ENUM_id) references structure_type_ENUM(structure_type_ENUM_id)
 ) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
 
 create table images (
