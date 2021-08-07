@@ -8,7 +8,6 @@ import { Posts } from 'photos/Posts';
 import { PhotosSummary } from 'photos/PhotosSummary';
 import { Home } from 'home/Home';
 
-
 function App() {
     return (
         <div>
