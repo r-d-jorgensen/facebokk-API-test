@@ -20,12 +20,15 @@ create table origin_ENUM (
     origin_type varchar(50) not null,
     primary key (origin_ENUM_id)
 )  engine=innodb auto_increment=1 default charset=utf8mb4 collate = utf8mb4_0900_ai_ci;
+insert into origin_EMUM values (default, facebook);
 
 create table structure_Type_ENUM (
 		structure_type_ENUM_id int not null,
     structure_type varchar(50) not null,
     primary key (structure_type_ENUM_id)
 )  engine=innodb auto_increment=1 default charset=utf8mb4 collate = utf8mb4_0900_ai_ci;
+insert into structure_Type_ENUM values (default, post);
+insert into structure_Type_ENUM values (default, photo);
 
 create table syncs (
   sync_id int not null auto_increment,
