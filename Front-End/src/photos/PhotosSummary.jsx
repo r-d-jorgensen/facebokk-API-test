@@ -12,19 +12,19 @@ function PhotosSummary() {
   const [loadingPosts, setLoadingPosts] = useState(true);
   //find all photos in feed and photos sections
   useEffect(() => {
-    getAllPhotos(); 
+    getAllPhotos();
     getAllFeedPhotos();
     apiCall();
     async function apiCall() {
       const photos = await axios.get(`https://localhost:8080/facebook/photos`);
       console.log(photos);
-      const posts = await axios.get(`https://localhost:8080/facebook/posts`);
-      console.log(posts);
+      //const posts = await axios.get(`https://localhost:8080/facebook/posts`);
+      //console.log(posts);
     }
 
     //iteratively calls photo endpoint till no more
     async function getAllPhotos() {
-      const fields = {"fields":"id,created_time,images"}
+      const fields = {"fields":"id,created_time,images"};
       let url = "/me/photos";
       let photos = [];
       while (true) {
@@ -35,7 +35,9 @@ function PhotosSummary() {
           setError("Facebook Returned Bad Data.");
           return;
         }
-        if (result.data.length !== 0) photos = photos.concat(result.data);
+        if (result.data.length !== 0) {
+          photos = photos.concat(result.data);
+        }
         if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
           setAllPhotos(photos);
