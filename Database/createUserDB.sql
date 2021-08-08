@@ -46,35 +46,28 @@ create table syncs (
 create table images (
   image_id int not null auto_increment,
   user_id int not null,
+  origin_ENUM_id int not null,
+  structure_type_ENUM_id int not null,
   src_link varchar(150) not null,
   width smallint not null,
   height smallint not null,
+  caption varchar(500),
+  created_at date not null,
   primary key (image_id),
-  foreign key (user_id) references users(user_id) on delete cascade
+  foreign key (user_id) references users(user_id) on delete cascade,
+  foreign key (origin_ENUM_id) references origin_ENUM(origin_ENUM_id),
+  foreign key (structure_type_ENUM_id) references structure_type_ENUM(structure_type_ENUM_id)
 ) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
 
 create table posts (
   post_id int not null auto_increment,
   user_id int not null,
-  image_id int not null,
+  image_id int,
   origin_ENUM_id int not null,
   created_at date not null,
   message varchar(500),
   primary key (post_id),
   foreign key (user_id) references users(user_id) on delete cascade,
   foreign key (image_id) references images(image_id ) on delete cascade,
-  foreign key (origin_ENUM_id) references origin_ENUM(origin_ENUM_id)
-) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
-
-create table photos (
-  photo_id int not null auto_increment,
-  user_id int not null,
-  image_id int not null,
-  origin_ENUM_id int not null,
-  created_at date not null,
-  caption varchar(500),
-  primary key (photo_id),
-  foreign key (user_id) references users(user_id) on delete cascade,
-  foreign key (image_id) references images(image_id) on delete cascade,
   foreign key (origin_ENUM_id) references origin_ENUM(origin_ENUM_id)
 ) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
