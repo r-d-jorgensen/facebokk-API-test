@@ -50,7 +50,7 @@ app.get('/facebook/posts/:id', (req, res, next) => {
 	res.status(200);
 });
 
-app.post('/facebook/posts', (req, res, next) => {
+app.post('/facebook/posts/:id', (req, res, next) => {
 	res.status(200);
 });
 
@@ -75,7 +75,7 @@ app.get('/facebook/photos/:id', (req, res, next) => {
 	});
 });
 
-app.post('/facebook/photos', (req, res, next) => {
+app.post('/facebook/photos/:id', (req, res, next) => {
 	let query = `insert into images values `;
 	//user_id needs to be pulled from req.params
 	//data needs to be checked BEFORE use

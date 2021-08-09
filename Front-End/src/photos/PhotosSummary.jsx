@@ -18,11 +18,14 @@ function PhotosSummary() {
 
     //iteratively calls photo endpoint till no more
     async function getAllPhotos() {
+      //need call to sync tabble
       //use for syncro and when facebooks calls are moved to server
-      //const photos = await axios.get(`https://localhost:8080/facebook/photos/${1}`);
+      //const data = await axios.get(`https://localhost:8080/facebook/photos/${1}`);
+      //console.log(data)
       const fields = {"fields":"id,created_time,images"};
       let url = "/me/photos";
       let photos = [];
+      //there should be a check to tell when it reached the last sync point
       while (true) {
         const result = await facebookAPICall(url, fields)
           .then(result => result)
@@ -46,8 +49,10 @@ function PhotosSummary() {
 
     //iteratively calls feed endpoint till no more
     async function getAllFeedPhotos() {
+      //need call to sync tabble
       //use for syncro and when facebooks calls are moved to server
-      //const posts = await axios.get(`https://localhost:8080/facebook/posts/${1}`);
+      //const data = await axios.get(`https://localhost:8080/facebook/posts/${1}`);
+      //console.log(data)
       const fields = {"fields":"id,type,message,created_time,full_picture,attachments"}
       let url = "/me/posts";
       let posts = [];
@@ -59,7 +64,9 @@ function PhotosSummary() {
           .then(result => result)
           .catch(error => setError(error));
         //only working with photo type posts rn
-        if (result.hasOwnProperty('data') && result.data.length !== 0) posts = posts.concat(result.data).filter(post => post.type === 'photo');
+        if (result.hasOwnProperty('data') && result.data.length !== 0) {
+          posts = posts.concat(result.data).filter(post => post.type === 'photo')
+        };
         if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
           //this will be removed with the facebook calls being pushed to the server
