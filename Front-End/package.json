@@ -1,6 +1,6 @@
 {
     "name": "data-movers-webpage",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "dependencies": {
         "axios": "^0.21.1",
         "history": "^4.10.1",

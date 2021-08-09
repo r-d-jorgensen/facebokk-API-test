@@ -1,5 +1,5 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { NavLink } from 'react-router-dom';
 import { Error } from '_components/Error';
 import { facebookAPICall } from '_helpers';
@@ -10,20 +10,16 @@ function PhotosSummary() {
   const [allPosts, setAllPosts] = useState([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
+
   //find all photos in feed and photos sections
   useEffect(() => {
     getAllPhotos();
     getAllFeedPhotos();
-    apiCall();
-    async function apiCall() {
-      const photos = await axios.get(`https://localhost:8080/facebook/photos`);
-      console.log(photos);
-      //const posts = await axios.get(`https://localhost:8080/facebook/posts`);
-      //console.log(posts);
-    }
 
     //iteratively calls photo endpoint till no more
     async function getAllPhotos() {
+      //use for syncro and when facebooks calls are moved to server
+      //const photos = await axios.get(`https://localhost:8080/facebook/photos/${1}`);
       const fields = {"fields":"id,created_time,images"};
       let url = "/me/photos";
       let photos = [];
@@ -35,13 +31,13 @@ function PhotosSummary() {
           setError("Facebook Returned Bad Data.");
           return;
         }
-        if (result.data.length !== 0) {
-          photos = photos.concat(result.data);
-        }
+        if (result.data.length !== 0) photos = photos.concat(result.data);
         if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
-          setAllPhotos(photos);
+          //reactivate with syncro
+          //axios.post(`https://localhost:8080/facebook/photos/${1}`, {data: photos});
           window.sessionStorage.setItem("photos", JSON.stringify(photos));
+          setAllPhotos(photos);
           setLoadingPhotos(false);
           return;
         }
@@ -49,9 +45,10 @@ function PhotosSummary() {
     }
 
     //iteratively calls feed endpoint till no more
-    //HACK... needs to filter before data gets here waste of cycles
     async function getAllFeedPhotos() {
-      const fields = {"fields":"id,type,message,created_time,full_picture"}
+      //use for syncro and when facebooks calls are moved to server
+      //const posts = await axios.get(`https://localhost:8080/facebook/posts/${1}`);
+      const fields = {"fields":"id,type,message,created_time,full_picture,attachments"}
       let url = "/me/posts";
       let posts = [];
       //to limit the number of call temperaraly
@@ -61,15 +58,21 @@ function PhotosSummary() {
         const result = await facebookAPICall(url, fields)
           .then(result => result)
           .catch(error => setError(error));
-        if (result.hasOwnProperty('data') && result.data.length !== 0) posts = posts.concat(result.data.filter(post => post.type === 'photo'));
+        //only working with photo type posts rn
+        if (result.hasOwnProperty('data') && result.data.length !== 0) posts = posts.concat(result.data).filter(post => post.type === 'photo');
         if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
+          //this will be removed with the facebook calls being pushed to the server
+          console.log(posts)
+          //axios.post(`https://localhost:8080/facebook/posts/${1}`, {data: posts});
           window.sessionStorage.setItem("posts", JSON.stringify(posts));
           setAllPosts(posts);
           setLoadingPosts(false);
           return;
         }
       }
+      console.log(posts)
+      //axios.post(`https://localhost:8080/facebook/posts/${1}`, {data: posts});
       window.sessionStorage.setItem("posts", JSON.stringify(posts));
       setAllPosts(posts);
       setLoadingPosts(false);
@@ -109,22 +112,22 @@ function PhotosSummary() {
         </thead>
         <tbody>
           <tr>
-            <td>All Stored Photos</td>
+            <td>All Stored</td>
             <td><NavLink to="/photos">{loadingPhotos ? 'Loading Photos' : allPhotos.length}</NavLink></td>
             <td><NavLink to="/posts">{loadingPosts ? 'Loading Posts' : allPosts.length}</NavLink></td>
           </tr>
           <tr>
-            <td>Past week Photos</td>
+            <td>Past week</td>
             <td>{loadingPhotos ? 'Loading Photos' : numberOfPhotosByDate(7, allPhotos)}</td>
             <td>{loadingPosts ? 'Loading Posts' : numberOfPhotosByDate(7, allPosts)}</td>
           </tr>
           <tr>
-            <td>Past month Photos</td>
+            <td>Past month</td>
             <td>{loadingPhotos ? 'Loading Photos' : numberOfPhotosByDate(30, allPhotos)}</td>
             <td>{loadingPosts ? 'Loading Posts' : numberOfPhotosByDate(30, allPosts)}</td>
           </tr>
           <tr>
-            <td>Past year Photos</td>
+            <td>Past year</td>
             <td>{loadingPhotos ? 'Loading Photos' : numberOfPhotosByDate(365, allPhotos)}</td>
             <td>{loadingPosts ? 'Loading Posts' : numberOfPhotosByDate(365, allPosts)}</td>
           </tr>
