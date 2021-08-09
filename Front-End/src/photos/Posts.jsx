@@ -43,11 +43,6 @@ function Posts() {
     setDisplayType(e.target.value);
   }
 
-  function sendData() {
-    console.log('sent data')
-    axios.post(`https://localhost:8080/facebook/posts`, {data: posts});
-  }
-
   if (!posts) return <h3>Loading Your Facebook Posts</h3>;
   if (posts.length === 0) return <h3>You don't have any posts avalible</h3>;
   return (
@@ -58,7 +53,6 @@ function Posts() {
       <button value={1} onClick={toggleSizes}>Medium</button>
       <button value={0} onClick={toggleSizes}>Large</button>
       <button onClick={() => {setShowMessage(showMessage ? false : true )}}>{showMessage ? "Hide Messages" : "Show Messages"}</button>
-      <button onClick={sendData}>Sync</button>
       <div style={{display: "grid", gridTemplateColumns: displayTypes[displayType].collumns, gridColumnGap: "10px", gridRowGap: "10px"}}>
         {posts.map(post =>
         <div
