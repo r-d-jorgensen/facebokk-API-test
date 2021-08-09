@@ -6,10 +6,6 @@ const https = require('https');
 const path = require('path');
 const fs = require('fs');
 
-//these are temp imports
-const { photoData } = require('./rawPhotoData');
-const { postData } = require('./rawPostData');
-
 const app = express();
 app.use(express.json({limit: '50mb'}));
 app.use(cors());
@@ -43,23 +39,22 @@ app.get('/user', (req, res, next) => {
   const query = `select * from users where user_id = ${req.body.id}`;
 	dbConnection.query(query, (err, data) => {
 		if (err) {
-			console.error("Failed to post data to server:\n" + err.stack);
+			console.error("Failed to get data from the server:\n" + err.stack);
 			return;
 		}
 		res.status(200).json(data);
 	});
 });
 
-app.get('/facebook/posts', (req, res, next) => {
-  res.send(postData);
+app.get('/facebook/posts/:id', (req, res, next) => {
+	res.status(200);
 });
 
 app.post('/facebook/posts', (req, res, next) => {
 	res.status(200);
 });
 
-app.get('/facebook/photos', (req, res, next) => {
-	//user_id needs to be pulled from req.params
+app.get('/facebook/photos/:id', (req, res, next) => {
 	const query = `
 		select
 			image_id,
@@ -69,7 +64,7 @@ app.get('/facebook/photos', (req, res, next) => {
 			caption,
 			created_at
 		from images
-		where user_id = ${1}`
+		where user_id = ${req.params.id}`
 	dbConnection.query(query, (err, data) => {
 		if (err) {
 			console.error("Failed to get data from DB:\n" + err.stack);
@@ -88,7 +83,7 @@ app.post('/facebook/photos', (req, res, next) => {
 	req.body.data.forEach((image) => {
 		query += `(
 			default,
-			${1},
+			${req.params.id},
 			1,
 			2,
 			\'${image.images[0].source}\',
