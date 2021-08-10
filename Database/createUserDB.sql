@@ -78,7 +78,7 @@ create table images (
   width int not null,
   height int not null,
   caption varchar(500),
-  created_at date not null,
+  created_at date,
   primary key (image_id),
   foreign key (user_id) references users(user_id) on delete cascade,
   foreign key (origin_ENUM_id) references origin_ENUM(origin_ENUM_id),

@@ -18,6 +18,8 @@ const sslServer = https.createServer({
 const WEB_PORT = process.env.WEB_PORT || 8000;
 sslServer.listen(WEB_PORT, () => console.log(`Secure server on port ${WEB_PORT}...`));
 
+//some quiery escaping should be done for all queries
+//may need to implement a pool type connection for post call
 const dbConnection = mysql.createConnection({
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
@@ -26,6 +28,7 @@ const dbConnection = mysql.createConnection({
 	database: process.env.DB_DATABASE,
 });
 
+//may need to open and close the connection for each call
 dbConnection.connect((err) => {
 	if (err) {
 		console.error("Database connection failed:\n" + err.stack);
@@ -40,6 +43,7 @@ app.get('/user', (req, res, next) => {
 	dbConnection.query(query, (err, data) => {
 		if (err) {
 			console.error("Failed to get data from the server:\n" + err.stack);
+			res.status(500);
 			return;
 		}
 		res.status(200).json(data);
@@ -47,11 +51,97 @@ app.get('/user', (req, res, next) => {
 });
 
 app.get('/facebook/posts/:id', (req, res, next) => {
-	res.status(200);
+	const query = `
+		select
+			post_id,
+			post_type_ENUM_id,
+			posts.created_at,
+			posts.message,
+			images.src_link,
+			images.width,
+			images.height
+		from posts
+		inner join post_attachments using(post_id)
+		inner join images using(image_id)
+		where posts.user_id = ${req.params.id};`
+	
+	dbConnection.query(query, (err, result) => {
+		if (err) {
+			console.error("Failed to get data from the DB:\n" + err.stack);
+			res.status(500);
+			return;
+		}
+		console.log('Data has been retrieved from the DB');
+		res.status(200).json(result);
+	});
 });
 
+//there are far too many for loops here for my liking but im not sure how to get around it
+//this god forsaken mess needs to be refactored
+//best idea is to use promises to flaten it out
 app.post('/facebook/posts/:id', (req, res, next) => {
+	req.body.data.forEach((post) => {
+		//insert post and retain id
+		const postQuery = `insert into posts values (
+			default,
+			${req.params.id},
+			1,
+			1,
+			\'${new Date(post.created_at).toISOString().split('T')[0]}}\',
+			\'${post.message}\');`
+		
+		//the begining of the pain
+		dbConnection.query(postQuery, (err, result) => {
+			if (err) {
+				console.error("Failed to post data to DB:\n" + err.stack);
+				res.status(500);
+				return;
+			}
+			let post_id = result.insertId;
+			//insert all images assosiated with he post using the post_id
+			//why call inside... because it wont let post_id out
+			post.images.forEach((image) => {
+				const imageQuery = `insert into images values (
+					default,
+					${req.params.id},
+					1,
+					1,
+					\'${image.src_link}\',
+					\'${image.width}\',
+					\'${image.height}\',
+					null,
+					null);`
+				
+				dbConnection.query(imageQuery, (err, result) => {
+					if (err) {
+						console.error("Failed to post data to DB:\n" + err.stack);
+						res.status(500);
+						return;
+					}
+					let image_id = result.insertId;
+
+					//insert a post_attachemnt row with the post_id and image_id
+					//ya it won't let image_id out ether.. so just call deeper
+					const attachmentQuery = `insert into post_attachments values (
+						default,
+						${post_id},
+						${image_id});`
+					
+					dbConnection.query(attachmentQuery, (err) => {
+						if (err) {
+							console.error("Failed to post data to DB:\n" + err.stack);
+							res.status(500);
+							return;
+							//never before have I seen that many sets of exits... and i hope i dont again
+						}
+					});
+				});
+			});
+		});
+	});
+
 	res.status(200);
+	console.log('Data has been posted to the DB');
 });
 
 app.get('/facebook/photos/:id', (req, res, next) => {
@@ -65,13 +155,15 @@ app.get('/facebook/photos/:id', (req, res, next) => {
 			created_at
 		from images
 		where user_id = ${req.params.id}`
-	dbConnection.query(query, (err, data) => {
+	
+	dbConnection.query(query, (err, result) => {
 		if (err) {
 			console.error("Failed to get data from DB:\n" + err.stack);
+			res.status(500);
 			return;
 		}
 		console.log('Data has been reterieved from the DB');
-		res.status(200).json(data);
+		res.status(200).json(result);
 	});
 });
 
@@ -93,9 +185,11 @@ app.post('/facebook/photos/:id', (req, res, next) => {
 			\'${new Date(image.created_time).toISOString().split('T')[0]}\'),`
 	});
 	query = query.slice(0, -1);
+
 	dbConnection.query(query, (err) => {
 		if (err) {
 			console.error("Failed to post data to DB:\n" + err.stack);
+			res.status(500);
 			return;
 		}
 		console.log('Data has been posted to the DB');
