@@ -59,7 +59,7 @@ function Posts() {
           onClick={() => toggleSelection(post.id)} 
           style={selectedPosts.includes(post.id) ? {border: "2px solid blue", borderRadius: "5px"} : {padding: "2px"}}>
           <img
-            src={post.images[0].source_link}
+            src={post.images[0].src_link}
             alt={post.message ? post.message : ""}
             width={displayTypes[displayType].width}
             height={displayTypes[displayType].height} />
