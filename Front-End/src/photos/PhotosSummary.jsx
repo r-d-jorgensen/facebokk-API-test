@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
 import { NavLink } from 'react-router-dom';
 import { Error } from '_components/Error';
 import { facebookAPICall } from '_helpers';
@@ -53,24 +53,63 @@ function PhotosSummary() {
       //use for syncro and when facebooks calls are moved to server
       //const data = await axios.get(`https://localhost:8080/facebook/posts/${1}`);
       //console.log(data)
-      const fields = {"fields":"id,type,message,created_time,full_picture,attachments"}
+      const fields = {"fields":"id,type,message,created_time,attachments"}
       let url = "/me/posts";
       let posts = [];
-      //to limit the number of call temperaraly
+      //this id is just to keep the selection system running on posts
+      var temp_id = 0
+      //to limit the number of calls temperaraly
       let i = 0;
-      while (i < 3) {
+      while (i < 1) {
         i += 1;
         const result = await facebookAPICall(url, fields)
           .then(result => result)
           .catch(error => setError(error));
-        //only working with photo type posts rn
         if (result.hasOwnProperty('data') && result.data.length !== 0) {
-          posts = posts.concat(result.data).filter(post => post.type === 'photo')
+          //only working with photo type posts rn
+          posts = posts.concat(...result.data.filter(post => post.type === 'photo').map((post) => {
+            //this should be removed latter
+            temp_id += 1;
+            switch (post.attachments.data[0].type) {
+              case 'photo':
+                return [{
+                  id: temp_id,
+                  type: 2,
+                  origin: 1,
+                  created_at: post.created_time,
+                  message: post.message,
+                  images: [{
+                    source_link: post.attachments.data[0].media.image.src,
+                    height: post.attachments.data[0].media.image.height,
+                    width: post.attachments.data[0].media.image.width,
+                  }]
+                }];
+              case 'album':
+                return  {
+                  id: temp_id,
+                  type: 2,
+                  origin: 1,
+                  created_at: post.created_time,
+                  message: post.message,
+                  images: post.attachments.data[0].subattachments.data.map((image) => {
+                    return {
+                      source_link: image.media.image.src,
+                      height: image.media.image.height,
+                      width: image.media.image.width,
+                    }
+                  })
+                }
+              default:
+                return {
+                  error: `Type ${post.attachments.data[0].type} is currently not supported`
+                }
+            }
+          }));
         };
         if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
           //this will be removed with the facebook calls being pushed to the server
-          console.log(posts)
+          //console.log(posts)
           //axios.post(`https://localhost:8080/facebook/posts/${1}`, {data: posts});
           window.sessionStorage.setItem("posts", JSON.stringify(posts));
           setAllPosts(posts);
@@ -78,7 +117,7 @@ function PhotosSummary() {
           return;
         }
       }
-      console.log(posts)
+      console.log(posts[0].images[0].source_link)
       //axios.post(`https://localhost:8080/facebook/posts/${1}`, {data: posts});
       window.sessionStorage.setItem("posts", JSON.stringify(posts));
       setAllPosts(posts);
