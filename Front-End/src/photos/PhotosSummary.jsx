@@ -117,7 +117,6 @@ function PhotosSummary() {
           return;
         }
       }
-      console.log(posts[0].images[0].source_link)
       //axios.post(`https://localhost:8080/facebook/posts/${1}`, {data: posts});
       window.sessionStorage.setItem("posts", JSON.stringify(posts));
       setAllPosts(posts);
