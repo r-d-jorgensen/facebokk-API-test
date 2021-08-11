@@ -62,7 +62,7 @@ create table syncs (
 	origin_ENUM_id int not null,
   structure_type_ENUM_id int not null,
   synced_at datetime not null,
-  deepest_checkpoint varchar(150),
+  deepest_checkpoint varchar(150) not null,
   primary key (sync_id),
   foreign key (user_id) references users(user_id) on delete cascade,
   foreign key (origin_ENUM_id) references origin_ENUM(origin_ENUM_id),
