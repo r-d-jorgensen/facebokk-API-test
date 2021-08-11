@@ -2,13 +2,13 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 import { render } from 'react-dom';
 
-// global stylesheet
+// Global stylesheet
 import './index.css';
 
 import { initFacebookSdk, history } from './_helpers';
 import { App } from './App';
 
-// wait for facebook sdk before startup
+// Wait for facebook sdk before startup
 initFacebookSdk().then(startApp);
 
 function startApp() { 

@@ -6,12 +6,14 @@ function Home() {
     useEffect(() => {
         loginUserWithFacebook();
 
+        // TODO: Move this function to a helper file
+        // If not a user make guest user account from fb account info and hold it in session storage
         async function loginUserWithFacebook() {
             const fbAccount = await facebookAPICall('/me', {"fields":"id,name,email,picture"})
                 .then(fbAccount => fbAccount)
                 .catch(error => console.log(error));
             const existingUser = await axios.get(`https://localhost:8080/facebook/user/${fbAccount.id}`);
-            // if not a user make guest user account from fb account info
+            
             if (existingUser.data.length === 0) {
                 const newUser =await axios.post(`https://localhost:8080/facebook/user`, {
                     data: {

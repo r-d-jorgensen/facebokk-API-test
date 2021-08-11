@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+
 import { Error } from '_components/Error';
 
 function UserInfo() {
     const [error, setError] = useState();
     const [account, setAccount] = useState();
-    // account data call
+    // Account data call
+    // TODO: This call is being made at home... consider inporting data from elsewhere
     useEffect(() => {
         window.FB.api(
             '/me',

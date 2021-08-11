@@ -1,4 +1,4 @@
-//method to call facebook api with promise
+// Method to call facebook api with promise
 export async function facebookAPICall(url, fields) {
   return await new Promise((resolve, reject) => {
     window.FB.api(

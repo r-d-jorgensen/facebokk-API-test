@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from 'react';
+
 import { dateCleaner } from '_helpers';
 
-// TODO: move the Photos and Posts pages into one component or have them do diffrent things
+// TODO: Move the Photos and Posts pages into one component or have them do diffrent things
 function Posts() {
   const [posts, setPosts] = useState();
   const [showMessage, setShowMessage] = useState(false);
   const [selectedPosts, setSelectedPosts] = useState([]);
-  const [displayType, setDisplayType] = useState(1); // should have ENUM
+  const [displayType, setDisplayType] = useState(1); // Should have ENUM
   const displayTypes = [
     {collumns: "auto auto auto", width: 400, height: 325},
     {collumns: "auto auto auto auto", width: 300, height: 225},
     {collumns: "auto auto auto auto auto", width: 200, height: 125},
   ]
-  // photos data call
+  
   useEffect(() => {
-    // should have some error checking here
-    // should be using a get call to server here
     setPosts(JSON.parse(window.sessionStorage.getItem("posts")));
   }, []);
 
-  // toggles individual photo selection
+  // Toggles individual photo selection
   function toggleSelection(id) {
     if (selectedPosts.includes(id)) {
       setSelectedPosts(selectedPosts.filter(item => item !== id));
@@ -28,7 +27,7 @@ function Posts() {
     }
   }
 
-  // toggles all photos
+  // Toggles all photos
   function togglePhotos() {
     if (selectedPosts.length === posts.length) {
       setSelectedPosts([]);

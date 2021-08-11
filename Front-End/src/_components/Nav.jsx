@@ -9,7 +9,7 @@ function Nav() {
         accountService.account.subscribe(x => setAccount(x));
     }, []);
 
-    // only show nav when logged in
+    // Only show nav when logged in
     if (!account) return null;
 
     return (

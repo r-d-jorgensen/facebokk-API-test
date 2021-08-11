@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { dateCleaner } from '_helpers';
 
 function Photos() {
@@ -6,11 +7,10 @@ function Photos() {
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   
   useEffect(() => {
-    // should have some error checking here
-    // should be using a get call to server here
     setPhotos(JSON.parse(window.sessionStorage.getItem("photos")));
   }, []);
 
+  // Toggles individual photo selection
   function toggleSelection(id) {
     if (selectedPhotos.includes(id)) {
       setSelectedPhotos(selectedPhotos.filter(item => item !== id));
@@ -19,6 +19,7 @@ function Photos() {
     }
   }
 
+  // Toggles all photos
   function toggleAll() {
     if (selectedPhotos.length === photos.length) {
       setSelectedPhotos([]);
