@@ -18,8 +18,10 @@ const sslServer = https.createServer({
 const WEB_PORT = process.env.WEB_PORT || 8000;
 sslServer.listen(WEB_PORT, () => console.log(`Secure server on port ${WEB_PORT}...`));
 
+//there is not nearly enough data checking going on in these calls... security is abysmal
 //some quiery escaping should be done for all queries
 //may need to implement a pool type connection for post call
+//post calls need to be self contained and not bring in data from outside only facebook
 const dbConnection = mysql.createConnection({
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
@@ -38,8 +40,8 @@ dbConnection.connect((err) => {
 });
 
 //shift routs to own page
-app.get('/user', (req, res, next) => {
-  const query = `select * from users where user_id = ${req.body.id}`;
+app.get('/facebook/user/:facebookID', (req, res, next) => {
+  const query = `select * from users where facebook_id = ${req.params.facebookID}`;
 	dbConnection.query(query, (err, data) => {
 		if (err) {
 			console.error("Failed to get data from the server:\n" + err.stack);
@@ -47,6 +49,29 @@ app.get('/user', (req, res, next) => {
 			return;
 		}
 		res.status(200).json(data);
+	});
+});
+
+app.post('/facebook/user', (req, res, next) => {
+  const newUser = req.body.data
+	const query = `
+		insert into users 
+		values (
+			default,
+			${newUser.user_type_ENUM_id},
+			${newUser.facebook_id},
+			'${newUser.username}',
+			${newUser.user_password},
+			'${newUser.email}');`;
+		console.log(query)
+	dbConnection.query(query, (err, result) => {
+		if (err) {
+			console.error("Failed to post data to the server:\n" + err.stack);
+			res.status(500);
+			return;
+		}
+		newUser["user_id"] = result.insertId;
+		res.status(200).json(newUser);
 	});
 });
 
