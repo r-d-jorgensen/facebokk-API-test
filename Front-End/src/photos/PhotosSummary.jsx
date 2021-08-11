@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
 import { NavLink } from 'react-router-dom';
 import { Error } from '_components/Error';
 import { facebookAPICall } from '_helpers';
@@ -20,7 +20,8 @@ function PhotosSummary() {
     async function getAllPhotos() {
       //need call to sync tabble
       //use for syncro and when facebooks calls are moved to server
-      //const data = await axios.get(`https://localhost:8080/facebook/photos/${1}`);
+      //const user = JSON.parse(window.sessionStorage.getItem("user"));
+      //const data = await axios.get(`https://localhost:8080/facebook/photos/${user.user_id}`);
       //console.log(data)
       const fields = {"fields":"id,created_time,images"};
       let url = "/me/photos";
@@ -38,7 +39,7 @@ function PhotosSummary() {
         if (result.hasOwnProperty('paging') && result.paging.hasOwnProperty('next')) url = result.paging.next;
         else {
           //reactivate with syncro
-          //axios.post(`https://localhost:8080/facebook/photos/${1}`, {data: photos});
+          //axios.post(`https://localhost:8080/facebook/photos/${user.user_id}`, {data: photos});
           window.sessionStorage.setItem("photos", JSON.stringify(photos));
           setAllPhotos(photos);
           setLoadingPhotos(false);
@@ -49,10 +50,10 @@ function PhotosSummary() {
 
     //iteratively calls feed endpoint till no more
     async function getAllFeedPhotos() {
-      //need call to sync tabble
       //use for syncro and when facebooks calls are moved to server
-      const data = await axios.get(`https://localhost:8080/facebook/posts/${1}`);
-      console.log(data)
+      //const user = JSON.parse(window.sessionStorage.getItem("user"));
+      //const data = await axios.get(`https://localhost:8080/facebook/posts/${user.user_id}`);
+      //console.log(data)
       const fields = {"fields":"id,type,message,created_time,attachments"}
       let url = "/me/posts";
       let posts = [];
@@ -66,7 +67,7 @@ function PhotosSummary() {
         if (result.hasOwnProperty('data') && result.data.length !== 0) {
           //only working with photo type posts rn
           posts = posts.concat(...result.data.filter(post => post.type === 'photo').map((post) => {
-            temp_id += 1; //this should be removed latter
+            temp_id += 1; //this should be removed latter when moved to DB
             switch (post.attachments.data[0].type) {
               case 'photo':
                 return [{
@@ -107,21 +108,22 @@ function PhotosSummary() {
         else {
           //this will be removed with the facebook calls being pushed to the server
           //console.log(posts)
-          //axios.post(`https://localhost:8080/facebook/posts/${1}`, {data: posts});
+          //axios.post(`https://localhost:8080/facebook/posts/${user.user_id}`, {data: posts});
           window.sessionStorage.setItem("posts", JSON.stringify(posts));
           setAllPosts(posts);
           setLoadingPosts(false);
           return;
         }
       }
-      console.log(posts)
-      //axios.post(`https://localhost:8080/facebook/posts/${1}`, {data: posts});
+      //axios.post(`https://localhost:8080/facebook/posts/${user.user_id}`, {data: posts});
       window.sessionStorage.setItem("posts", JSON.stringify(posts));
       setAllPosts(posts);
       setLoadingPosts(false);
     }
   }, []);
 
+  //TODO: this will need to be changed to match the new data format from the server
+  //currently broken because of DB changes and data transfers
   function numberOfPhotosByDate(days, data) {
     const _MS_PER_DAY = 1000 * 60 * 60 * 24;
     const today = new Date();
