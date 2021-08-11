@@ -6,8 +6,8 @@ function Photos() {
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   
   useEffect(() => {
-    //should have some error checking here
-    //should be using a get call to server here
+    // should have some error checking here
+    // should be using a get call to server here
     setPhotos(JSON.parse(window.sessionStorage.getItem("photos")));
   }, []);
 
