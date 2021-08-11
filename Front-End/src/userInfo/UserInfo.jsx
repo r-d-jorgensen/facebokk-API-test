@@ -4,7 +4,7 @@ import { Error } from '_components/Error';
 function UserInfo() {
     const [error, setError] = useState();
     const [account, setAccount] = useState();
-    ///account data call
+    // account data call
     useEffect(() => {
         window.FB.api(
             '/me',
