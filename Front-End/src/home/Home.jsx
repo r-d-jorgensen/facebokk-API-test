@@ -13,7 +13,7 @@ function Home() {
                 .then(fbAccount => fbAccount)
                 .catch(error => console.log(error));
             const existingUser = await axios.get(`https://localhost:8080/facebook/user/${fbAccount.id}`);
-            
+            console.log(existingUser)
             if (existingUser.data.length === 0) {
                 const newUser =await axios.post(`https://localhost:8080/facebook/user`, {
                     data: {
