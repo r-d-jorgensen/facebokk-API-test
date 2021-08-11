@@ -12,10 +12,9 @@ function Home() {
             const fbAccount = await facebookAPICall('/me', {"fields":"id,name,email,picture"})
                 .then(fbAccount => fbAccount)
                 .catch(error => console.log(error));
-            const existingUser = await axios.get(`https://localhost:8080/facebook/user/${fbAccount.id}`);
-            console.log(existingUser)
+            const existingUser = await axios.get(`https://localhost:8080/user/facebook/${fbAccount.id}`);
             if (existingUser.data.length === 0) {
-                const newUser =await axios.post(`https://localhost:8080/facebook/user`, {
+                const newUser =await axios.post(`https://localhost:8080/user/facebook`, {
                     data: {
                         user_type_ENUM_id: 3,
                         facebook_id: fbAccount.id,
