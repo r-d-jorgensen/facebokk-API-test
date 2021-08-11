@@ -48,7 +48,7 @@ insert into post_type_ENUM values (default, 'mixed');
 create table users (
     user_id int not null auto_increment,
     user_type_ENUM_id int not null,
-    facebook_id int,
+    facebook_id varchar(25),
     username varchar(50) not null,
     user_password varchar(50) not null,
     email varchar(50),
