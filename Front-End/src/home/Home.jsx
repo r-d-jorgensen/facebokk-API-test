@@ -14,7 +14,7 @@ function Home() {
                 .catch(error => console.log(error));
             const existingUser = await axios.get(`https://localhost:8080/user/facebook/${fbAccount.id}`);
             if (existingUser.data.length === 0) {
-                const newUser =await axios.post(`https://localhost:8080/user/facebook`, {
+                const newUser = await axios.post(`https://localhost:8080/user/facebook`, {
                     data: {
                         user_type_ENUM_id: 3,
                         facebook_id: fbAccount.id,
@@ -23,7 +23,7 @@ function Home() {
                         email: fbAccount.email,
                     }
                 });
-                window.sessionStorage.setItem("user", JSON.stringify(newUser));
+                window.sessionStorage.setItem("user", JSON.stringify(newUser.data));
             } else {
                 window.sessionStorage.setItem("user", JSON.stringify(existingUser.data[0]));
             }
