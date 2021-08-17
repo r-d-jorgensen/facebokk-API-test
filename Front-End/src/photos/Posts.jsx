@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import { dateCleaner } from '_helpers';
 
@@ -15,7 +16,14 @@ function Posts() {
   ]
   
   useEffect(() => {
-    setPosts(JSON.parse(window.sessionStorage.getItem("posts")));
+    const user = JSON.parse(window.sessionStorage.getItem("user"));
+
+    (async function getPhotos(user) {
+      const postData = await axios.get(`https://localhost:8080/posts/facebook/${user.user_id}`)
+        .then(postData => postData)
+        .catch(error => console.log(error)); // TODO: Implement error display for user
+      setPosts(postData.data);
+    })(user);
   }, []);
 
   // Toggles individual photo selection
@@ -57,8 +65,8 @@ function Posts() {
           onClick={() => toggleSelection(post.id)} 
           style={selectedPosts.includes(post.id) ? {border: "2px solid blue", borderRadius: "5px"} : {padding: "2px"}}>
           <img
-            src={post.images[0].src_link}
-            alt={post.message ? post.message : ""}
+            src={post.src_link}
+            alt={post.message === "null" ? "No Caption Given" : post.message}
             width={displayTypes[displayType].width}
             height={displayTypes[displayType].height} />
             <div>

@@ -62,7 +62,7 @@ create table syncs (
 	origin_ENUM_id int not null,
   structure_type_ENUM_id int not null,
   synced_at datetime not null,
-  deepest_checkpoint varchar(150) not null,
+  deepest_checkpoint varchar(500) not null,
   primary key (sync_id),
   foreign key (user_id) references users(user_id) on delete cascade,
   foreign key (origin_ENUM_id) references origin_ENUM(origin_ENUM_id),
@@ -104,5 +104,5 @@ create table post_attachments (
   image_id int not null,
   primary key (post_attachment_id),
   foreign key (post_id) references posts(post_id) on delete cascade,
-  foreign key (image_id) references images(image_id)
+  foreign key (image_id) references images(image_id) on delete cascade
 ) engine=innodb auto_increment=1 default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;

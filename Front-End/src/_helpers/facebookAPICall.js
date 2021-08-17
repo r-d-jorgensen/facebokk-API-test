@@ -6,7 +6,7 @@ export async function facebookAPICall(url, fields) {
       'GET',
       fields,
       function (response) {
-        if (response.error) reject(new Error(response.error));
+        if (response.error) reject(response.error);
         else resolve(response);
       }
     );

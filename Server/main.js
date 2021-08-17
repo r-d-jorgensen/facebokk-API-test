@@ -18,10 +18,6 @@ const sslServer = https.createServer({
 const WEB_PORT = process.env.WEB_PORT || 8000;
 sslServer.listen(WEB_PORT, () => console.log(`Secure server on port ${WEB_PORT}...`));
 
-//there is not nearly enough data checking going on in these calls... security is abysmal
-//some quiery escaping should be done for all queries
-//may need to implement a pool type connection for post call
-//post calls need to be self contained and not bring in data from outside only facebook
 const dbConnection = mysql.createConnection({
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
@@ -30,7 +26,7 @@ const dbConnection = mysql.createConnection({
 	database: process.env.DB_DATABASE,
 });
 
-//may need to open and close the connection for each call
+// TODO: May need to open and close the connection for each call
 dbConnection.connect((err) => {
 	if (err) {
 		console.error("Database connection failed:\n" + err.stack);
@@ -39,12 +35,26 @@ dbConnection.connect((err) => {
 	console.log("Connected to database.");
 });
 
-//shift routs to own page
-app.get('/facebook/user/:facebookID', (req, res, next) => {
+// TODO: Pomises are needed almost everywehre... pick a place.. it needs them
+// TODO: Shift routes to own page
+// TODO: Data needs to be checked BEFORE use... not after
+// TODO: Some quiery escaping should be done for all queries
+// TODO: May need to implement a pool type connection for post calls.. there are alot of them and concency is a nice thing
+// TODO: Post calls need to be self contained and not bring in data from outside only facebook
+// TODO: Status returns should only happen at the end or at error not whenever a DB call is successful
+// TODO: Look into calls geting stacked in server resulting in duplicate DB queries
+// TODO: Join ENUM vales with ENUM_ids for more readable code and returns
+// TODO: Make 'facebook' in route conform with ENUM_ids of origin_ENUMs
+// TODO: Make 'posts' and 'photos' in route conform with ENUM_ids of structure_type_ENUM then combine them
+// TODO: Create midleware and fix spelling mistakes in DB calls for error and success calls
+// TODO: Hash user_id and other important values
+// TODO: Log files
+// TODO: Facebook may display photos that are in albums or posts multiple times... check for dublicates when posting with idetifier
+app.get('/user/facebook/:facebookID', (req, res) => {
   const query = `select * from users where facebook_id = ${req.params.facebookID}`;
 	dbConnection.query(query, (err, data) => {
 		if (err) {
-			console.error("Failed to get data from the server:\n" + err.stack);
+			console.error("Failed to get user from the server:\n" + err.stack);
 			res.status(500);
 			return;
 		}
@@ -52,7 +62,7 @@ app.get('/facebook/user/:facebookID', (req, res, next) => {
 	});
 });
 
-app.post('/facebook/user', (req, res, next) => {
+app.post('/user/facebook', (req, res) => {
   const newUser = req.body.data
 	const query = `
 		insert into users 
@@ -62,11 +72,12 @@ app.post('/facebook/user', (req, res, next) => {
 			${newUser.facebook_id},
 			'${newUser.username}',
 			${newUser.user_password},
-			'${newUser.email}');`;
-		console.log(query)
+			'${newUser.email}'
+		);`;
+
 	dbConnection.query(query, (err, result) => {
 		if (err) {
-			console.error("Failed to post data to the server:\n" + err.stack);
+			console.error("Failed to post user to the server:\n" + err.stack);
 			res.status(500);
 			return;
 		}
@@ -75,7 +86,20 @@ app.post('/facebook/user', (req, res, next) => {
 	});
 });
 
-app.get('/facebook/posts/:id', (req, res, next) => {
+// Delete user from DB and all data assosiated
+app.delete('/user/:user_id', (req, res) => {
+	dbConnection.query(`delete from users where user_id = ${req.params.user_id};`, (err) => {
+		if (err) {
+			console.error("Failed to post user to the server:\n" + err.stack);
+			res.status(500);
+			return;
+		}
+		console.log('User has been deleted from the DB');
+		res.status(200);
+	});
+});
+
+app.get('/posts/facebook/:user_id', (req, res) => {
 	const query = `
 		select
 			post_id,
@@ -88,47 +112,56 @@ app.get('/facebook/posts/:id', (req, res, next) => {
 		from posts
 		inner join post_attachments using(post_id)
 		inner join images using(image_id)
-		where posts.user_id = ${req.params.id};`
+		where
+			posts.user_id = ${req.params.user_id} and
+			structure_type_ENUM_id = 1;`;
 	
 	dbConnection.query(query, (err, result) => {
 		if (err) {
-			console.error("Failed to get data from the DB:\n" + err.stack);
+			console.error("Failed to get posts from the DB:\n" + err.stack);
 			res.status(500);
 			return;
 		}
-		console.log('Data has been retrieved from the DB');
+		console.log('Posts has been retrieved from the DB');
 		res.status(200).json(result);
 	});
 });
 
-//there are far too many for loops here for my liking but im not sure how to get around it
-//this god forsaken mess needs to be refactored
-//best idea is to use promises to flaten it out
-app.post('/facebook/posts/:id', (req, res, next) => {
-	req.body.data.forEach((post) => {
-		//insert post and retain id
-		const postQuery = `insert into posts values (
+// TODO: Refactor the call using promises to remove the callbacks
+app.post('/posts/facebook/:user_id', (req, res) => {
+	newSynco(req.params.user_id, req.body.deepest_checkpoint, 1, 1, req.body.passedSyncs);
+	if (req.body.posts.length === 0) {
+		console.log('No posts sent');
+		res.status(200);
+		return
+	};
+
+	req.body.posts.forEach((post) => {
+		// Insert post and retain id
+		const postQuery = `insert into posts
+		values (
 			default,
-			${req.params.id},
+			${req.params.user_id},
 			1,
 			1,
-			\'${new Date(post.created_at).toISOString().split('T')[0]}}\',
-			\'${post.message}\');`
+			'${new Date(post.created_at).toISOString()}}',
+			'${post.message}'
+		);`
 		
-		//the begining of the pain
+		// The begining of the pain
 		dbConnection.query(postQuery, (err, result) => {
 			if (err) {
-				console.error("Failed to post data to DB:\n" + err.stack);
+				console.error("Failed to post posts to DB:\n" + err.stack);
 				res.status(500);
 				return;
 			}
 			let post_id = result.insertId;
-			//insert all images assosiated with he post using the post_id
-			//why call inside... because it wont let post_id out
+			// Insert all images assosiated with he post using the post_id
+			// Why call inside... because it wont let post_id out
 			post.images.forEach((image) => {
 				const imageQuery = `insert into images values (
 					default,
-					${req.params.id},
+					${req.params.user_id},
 					1,
 					1,
 					\'${image.src_link}\',
@@ -139,14 +172,14 @@ app.post('/facebook/posts/:id', (req, res, next) => {
 				
 				dbConnection.query(imageQuery, (err, result) => {
 					if (err) {
-						console.error("Failed to post data to DB:\n" + err.stack);
+						console.error("Failed to post images to DB:\n" + err.stack);
 						res.status(500);
 						return;
 					}
 					let image_id = result.insertId;
 
-					//insert a post_attachemnt row with the post_id and image_id
-					//ya it won't let image_id out ether.. so just call deeper
+					// Insert a post_attachemnt row with the post_id and image_id
+					// Ya it won't let image_id out ether.. so just call deeper
 					const attachmentQuery = `insert into post_attachments values (
 						default,
 						${post_id},
@@ -154,10 +187,10 @@ app.post('/facebook/posts/:id', (req, res, next) => {
 					
 					dbConnection.query(attachmentQuery, (err) => {
 						if (err) {
-							console.error("Failed to post data to DB:\n" + err.stack);
+							console.error("Failed to post attachments to DB:\n" + err.stack);
 							res.status(500);
 							return;
-							//never before have I seen that many sets of exits... and i hope i dont again
+							// Never before have I seen that many sets of exits... and i hope i dont again
 						}
 					});
 				});
@@ -169,7 +202,7 @@ app.post('/facebook/posts/:id', (req, res, next) => {
 	console.log('Data has been posted to the DB');
 });
 
-app.get('/facebook/photos/:id', (req, res, next) => {
+app.get('/photos/facebook/:user_id', (req, res) => {
 	const query = `
 		select
 			image_id,
@@ -179,45 +212,129 @@ app.get('/facebook/photos/:id', (req, res, next) => {
 			caption,
 			created_at
 		from images
-		where user_id = ${req.params.id}`
-	
+		where
+			user_id = ${req.params.user_id} and
+			structure_type_ENUM_id = 2`;
 	dbConnection.query(query, (err, result) => {
 		if (err) {
-			console.error("Failed to get data from DB:\n" + err.stack);
+			console.error("Failed to get photos from DB:\n" + err.stack);
 			res.status(500);
 			return;
 		}
-		console.log('Data has been reterieved from the DB');
+		console.log('Photos has been retrieved from the DB');
 		res.status(200).json(result);
 	});
 });
 
-app.post('/facebook/photos/:id', (req, res, next) => {
-	let query = `insert into images values `;
-	//user_id needs to be pulled from req.params
-	//data needs to be checked BEFORE use
-	//should be a limit on how big this insert can get
-	req.body.data.forEach((image) => {
-		query += `(
-			default,
-			${req.params.id},
+// TODO: Needs to return the posted photos with thier corisponding photo_id's
+app.post('/photos/facebook/:user_id', (req, res) => {
+	newSynco(req.params.user_id, req.body.deepest_checkpoint, 1, 2);
+	if (req.body.photos.length === 0) {
+		console.log('No photos sent');
+		res.status(200);
+		return
+	};
+
+	req.body.photos.forEach((photo) => {
+		const inserts = [
+			'default',
+			req.params.user_id,
 			1,
 			2,
-			\'${image.images[0].source}\',
-			${image.images[0].width},
-			${image.images[0].height},
-			${null},
-			\'${new Date(image.created_time).toISOString().split('T')[0]}\'),`
+			photo.src_link,
+			photo.width,
+			photo.height,
+			photo.caption,
+			photo.created_at
+		];
+		//const query = "insert into images value";
+		dbConnection.query("insert into images values ( ? )", [inserts], (err) => {
+			if (err) {
+				console.error("Failed to photos data to DB:\n" + err.stack);
+				res.status(500);
+				return;
+			}
+			return;
+		});
 	});
-	query = query.slice(0, -1);
+	console.log('Photos has been posted to the DB');
+	res.status(200);
+});
 
-	dbConnection.query(query, (err) => {
+app.get('/sync/:structure_type_ENUM/facebook/:user_id', (req, res) => {
+	// TODO: Change to joins to make more legible and expandable
+	let structure_type_ENUM_id = 0;
+	if (req.params.structure_type_ENUM === 'post') structure_type_ENUM_id = 1;
+	else if (req.params.structure_type_ENUM === 'photo') structure_type_ENUM_id = 2;
+	else {
+		console.log(`Format type ${req.params.structure_type_ENUM} is not supported`)
+		res.status(400);
+	}
+	const query = `
+	select
+		sync_id,
+		synced_at,
+		deepest_checkpoint
+	from syncs
+	where
+		user_id = ${req.params.user_id} and
+		structure_type_ENUM_id = ${structure_type_ENUM_id}`;
+	dbConnection.query(query, (err, result) => {
 		if (err) {
-			console.error("Failed to post data to DB:\n" + err.stack);
-			res.status(500);
+			console.error("Failed to retrieved syncs from the DB:\n" + err.stack);
 			return;
 		}
-		console.log('Data has been posted to the DB');
-		res.status(200);
+		console.log('Sync has been retrieved from the DB');
+		res.status(200).json(result);
 	});
 });
+
+// Creates sync entity when user makes calls to outside locations
+// TODO: Should look into making this a midleware for post queries
+// TODO: Return value for checking success of failure
+function newSynco(user_id, deepest_checkpoint, origin_ENUM_id, structure_type_ENUM_id, passedSyncs) {
+	if (deepest_checkpoint === 'floor') {
+		// TODO: update the latest sync not delete then return
+		const syncQuery = `
+		delete from syncs
+		where
+			origin_ENUM_id = ${origin_ENUM_id} and
+			structure_type_ENUM_id = ${structure_type_ENUM_id}`;
+
+		dbConnection.query(syncQuery, (err) => {
+			if (err) {
+				console.error("Failed to remove Sync from the DB:\n" + err.stack);
+				return;
+			}
+			console.log('Sync has been removed from the DB');
+		});
+	} else {
+		passedSyncs.forEach((sync_id) => {
+			dbConnection.query(`delete from syncs where sync_id = ${sync_id}`, (err) => {
+				if (err) {
+					console.error("Failed to removed Sync to the DB:\n" + err.stack);
+					return;
+				}
+				console.log('Sync has been removed to the DB');
+			});
+		});
+	}
+	const syncQuery = `
+	insert into syncs
+	values (
+		default,
+		${user_id},
+		${origin_ENUM_id},
+		${structure_type_ENUM_id},
+		'${new Date().toISOString()}',
+		'${deepest_checkpoint}'
+	)`;
+
+	dbConnection.query(syncQuery, (err) => {
+		if (err) {
+			console.error("Failed to post Sync to the DB:\n" + err.stack);
+			return;
+		}
+		console.log('Sync has been posted to the DB');
+	});
+}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import { dateCleaner } from '_helpers';
 
@@ -7,15 +8,22 @@ function Photos() {
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   
   useEffect(() => {
-    setPhotos(JSON.parse(window.sessionStorage.getItem("photos")));
+    const user = JSON.parse(window.sessionStorage.getItem("user"));
+
+    (async function getPhotos(user) {
+      const photoData = await axios.get(`https://localhost:8080/photos/facebook/${user.user_id}`)
+        .then(photoData => photoData)
+        .catch(error => console.log(error)); // TODO: Implement error display for user
+      setPhotos(photoData.data);
+    })(user);
   }, []);
 
   // Toggles individual photo selection
-  function toggleSelection(id) {
-    if (selectedPhotos.includes(id)) {
-      setSelectedPhotos(selectedPhotos.filter(item => item !== id));
+  function toggleSelection(image_id) {
+    if (selectedPhotos.includes(image_id)) {
+      setSelectedPhotos(selectedPhotos.filter(item => item !== image_id));
     } else {
-      setSelectedPhotos(selectedPhotos.concat([id]));
+      setSelectedPhotos(selectedPhotos.concat([image_id]));
     }
   }
 
@@ -24,10 +32,10 @@ function Photos() {
     if (selectedPhotos.length === photos.length) {
       setSelectedPhotos([]);
     } else {
-      setSelectedPhotos(photos.map(photo => photo.id))
+      setSelectedPhotos(photos.map(photo => photo.image_id))
     }
   }
-
+  
   if (!photos) return <h3>Loading Your Facebook Photos</h3>;
   if (photos.length === 0) return <h3>You don't have any photos avalible</h3>;
   return (
@@ -37,18 +45,18 @@ function Photos() {
       <div style={{display: "grid", gridTemplateColumns: "auto auto auto auto", gridColumnGap: "10px", gridRowGap: "10px"}}>
         {photos.map(photo =>
           <div
-            key={photo.id}
-            onClick={() => toggleSelection(photo.id)} 
-            style={selectedPhotos.includes(photo.id) ? {border: "2px solid blue", borderRadius: "5px"} : {padding: "2px"}}>
+            key={photo.image_id}
+            onClick={() => toggleSelection(photo.image_id)} 
+            style={selectedPhotos.includes(photo.image_id) ? {border: "2px solid blue", borderRadius: "5px"} : {padding: "2px"}}>
             <img
-              src={photo.images[6].source}
-              alt={photo.name ? photo.name : ""}
+              src={photo.src_link}
+              alt={photo.caption ? photo.caption : ""}
               width={300}
               height={225} />
               <div>
-                Created on: {dateCleaner(photo.created_time)}
+                Created on: {dateCleaner(photo.created_at)}
                 <br />
-                {photo.name ? photo.name : "No Caption Given"}
+                {photo.caption === "null" ? "No Caption Given" : photo.caption}
               </div>
         </div>)}
       </div>
