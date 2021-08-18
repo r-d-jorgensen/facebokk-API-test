@@ -53,7 +53,7 @@ function PhotosSummary() {
 
     //Syncronizes and gets post data from and with the DB and FB servers
     async function syncronizePosts(user) {
-      const fields = {"fields":"id,type,message,created_time,attachments"}
+      const fields = {"fields":"id,type,message,created_time,attachments"};
       const url = "/me/posts";
       const savedPostData = await axios.get(`https://localhost:8080/posts/facebook/${user.user_id}`);
       const newPostData = await getNewFBData(user, 'post', fields, url);

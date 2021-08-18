@@ -54,10 +54,11 @@ app.get('/user/facebook/:facebookID', (req, res) => {
   const query = `select * from users where facebook_id = ${req.params.facebookID}`;
 	dbConnection.query(query, (err, data) => {
 		if (err) {
-			console.error("Failed to get user from the server:\n" + err.stack);
+			console.error("Failed to get user from the DB:\n" + err.stack);
 			res.status(500);
 			return;
 		}
+		console.error("Retrieved user from the DB");
 		res.status(200).json(data);
 	});
 });
@@ -90,7 +91,7 @@ app.post('/user/facebook', (req, res) => {
 app.delete('/user/:user_id', (req, res) => {
 	dbConnection.query(`delete from users where user_id = ${req.params.user_id};`, (err) => {
 		if (err) {
-			console.error("Failed to post user to the server:\n" + err.stack);
+			console.error("Failed to delete user to the server:\n" + err.stack);
 			res.status(500);
 			return;
 		}
@@ -131,7 +132,7 @@ app.get('/posts/facebook/:user_id', (req, res) => {
 app.post('/posts/facebook/:user_id', (req, res) => {
 	newSynco(req.params.user_id, req.body.deepest_checkpoint, 1, 1, req.body.passedSyncs);
 	if (req.body.posts.length === 0) {
-		console.log('No posts sent');
+		console.log('No posts recieved');
 		res.status(200);
 		return
 	};
@@ -230,7 +231,7 @@ app.get('/photos/facebook/:user_id', (req, res) => {
 app.post('/photos/facebook/:user_id', (req, res) => {
 	newSynco(req.params.user_id, req.body.deepest_checkpoint, 1, 2);
 	if (req.body.photos.length === 0) {
-		console.log('No photos sent');
+		console.log('No photos recieved');
 		res.status(200);
 		return
 	};
