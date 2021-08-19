@@ -210,7 +210,28 @@ function PhotosSummary() {
 
   // TODO: Ask for conformation before firing the full delete
   function deleteUser() {
-    axios.delete(`https://localhost:8080/user/${user.user_id}`);
+    // TODO: needs to not logout user if catch is trigered
+    axios.delete(`https://localhost:8080/user/${user.user_id}`)
+      .catch((error) => {
+        // TODO: This code should be ofloaded to a helper function
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
+        return;
+      });
     window.sessionStorage.clear();
     accountService.logout();
   }
