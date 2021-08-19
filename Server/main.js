@@ -91,15 +91,24 @@ app.post('/user/facebook', (req, res) => {
 	});
 });
 
-// Delete user from DB and all data assosiated
-app.delete('/user/:user_id', (req, res) => {
-	console.log(req); // TRACE
+// Delete user and all associated data from DB
+app.delete.userdata_DB('/user/:user_id', (req, res) => {
+	// There should be a way to turn TRACE and DEGUG on and off and the system will record more or less data in the console log as a result. 
+
+	if TRACE == TRUE then console.log(req); // TRACE this is an optional item only if we want deep tracing
+	//Where can we test to make sure that all the use cases are working? should this be inline as a flag or seperated out to a different test module. How do we know that the edge cases are working as expected?
+	//  TEST: user_id = -1;
+	//  TEST: user_id = "ABCDE";
+	//  TEST: user_id = "multiple values???";
+	//  TESTL user_id = null;
+
 	const schema = Joi.object({user_id: Joi.number().integer().positive().required()});
 	const {error, value: user_id} = schema.validate({user_id: req.params.user_id});
+	// Errors always display as much data as possible
 	if (error) {
-		console.log(`User has sent bad user_id, ${req.params.user_id}, to server`); // INFO
+		console.log(`Server has received an invalid user_id, ${req.params.user_id}, aborting.`); // INFO
 		console.log(error.details.message) // DEBUG
-		console.log(error); //TRACE
+		console.log(error);
 		res.status(400).json(error);
 		return;
 	}
@@ -107,15 +116,20 @@ app.delete('/user/:user_id', (req, res) => {
 	console.log(`User with id: ${user_id} sent delete query to DB`); // DEBUG
 	dbConnection.query("delete from users where user_id = ?;", user_id, (error, results, fields) => {
 		if (error) {
-			console.log(`Failed to delete user with id ${user_id} to the server`); // ERROR
+			console.log(`Unable to delete user and associated data with id ${user_id} from the server, aborting`); // ERROR
 			console.log(error.stack); // DEBUG
 			console.log(error); //TRACE
 			res.status(500).send(`DB query failed with error ${error.stack}`);
+			// Does this method properly communicate the following scenarios:
+			//   - DB Down or DB connection failed - this tells you where the error occured
+			//   - No Data was deleted but the connection was already there and everything worked
+			//   - The Data was attempted to be deleted but there was a problem when the cascade was attempted.
 			return;
 		}
-		console.log(`User, ${user_id}, has been deleted from the DB`); // INFO
-		console.log(results); // DEBUG
-		console.log(fields); // TRACE
+		console.log(`User, ${user_id}, and associated data were sucessfully deleted from the DB`); // INFO
+		// Can or Should we attempt to retrieve the data and confirm that no records exist in any supporting table? If data is returned, then there is a problem.
+		if DEBUG = TRUE then console.log(results); // DEBUG
+		if TRACE = TRUE then console.log(fields); // TRACE
 		res.status(200);
 	});
 });
