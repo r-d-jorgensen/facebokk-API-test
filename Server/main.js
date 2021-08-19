@@ -5,6 +5,7 @@ const cors = require('cors');
 const https = require('https');
 const path = require('path');
 const fs = require('fs');
+const Joi = require('joi');
 
 const app = express();
 app.use(express.json({limit: '50mb'}));
@@ -35,10 +36,13 @@ dbConnection.connect((err) => {
 	console.log("Connected to database.");
 });
 
+// TODO: Data needs to be checked BEFORE use... not after
+// TODO: Breakdown of the diffrent DB errors in log file for FATAL, ERROR and WARN levels
 // TODO: Pomises are needed almost everywehre... pick a place.. it needs them
 // TODO: Shift routes to own page
-// TODO: Data needs to be checked BEFORE use... not after
-// TODO: Some quiery escaping should be done for all queries
+// TODO: Need SSL for DB connection
+// TODO: Look into shifting to Sequelize for queries... https://sequelize.org/master/manual/getting-started.html
+// TODO: Some quiery escaping should be done
 // TODO: May need to implement a pool type connection for post calls.. there are alot of them and concency is a nice thing
 // TODO: Post calls need to be self contained and not bring in data from outside only facebook
 // TODO: Status returns should only happen at the end or at error not whenever a DB call is successful
@@ -89,13 +93,29 @@ app.post('/user/facebook', (req, res) => {
 
 // Delete user from DB and all data assosiated
 app.delete('/user/:user_id', (req, res) => {
-	dbConnection.query(`delete from users where user_id = ${req.params.user_id};`, (err) => {
-		if (err) {
-			console.error("Failed to delete user to the server:\n" + err.stack);
-			res.status(500);
+	console.log(req); // TRACE
+	const schema = Joi.object({user_id: Joi.number().integer().positive().required()});
+	const {error, value: user_id} = schema.validate({user_id: req.params.user_id});
+	if (error) {
+		console.log(`User has sent bad user_id, ${req.params.user_id}, to server`); // INFO
+		console.log(error.details.message) // DEBUG
+		console.log(error); //TRACE
+		res.status(400).json(error);
+		return;
+	}
+
+	console.log(`User with id: ${user_id} sent delete query to DB`); // DEBUG
+	dbConnection.query("delete from users where user_id = ?;", user_id, (error, results, fields) => {
+		if (error) {
+			console.log(`Failed to delete user with id ${user_id} to the server`); // ERROR
+			console.log(error.stack); // DEBUG
+			console.log(error); //TRACE
+			res.status(500).send(`DB query failed with error ${error.stack}`);
 			return;
 		}
-		console.log('User has been deleted from the DB');
+		console.log(`User, ${user_id}, has been deleted from the DB`); // INFO
+		console.log(results); // DEBUG
+		console.log(fields); // TRACE
 		res.status(200);
 	});
 });
