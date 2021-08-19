@@ -92,15 +92,18 @@ app.post('/user/facebook', (req, res) => {
 });
 
 // Delete user and all associated data from DB
-app.delete.userdata_DB('/user/:user_id', (req, res) => {
+app.delete('/user/:user_id', (req, res) => {
 	// There should be a way to turn TRACE and DEGUG on and off and the system will record more or less data in the console log as a result. 
+	const trace = TRUE ;  // TODO: This should be a global constant that can be set
+	const debug = TRUE ;  // TODO: This should be a global constant that can be set
 
-	if TRACE == TRUE then console.log(req); // TRACE this is an optional item only if we want deep tracing
-	//Where can we test to make sure that all the use cases are working? should this be inline as a flag or seperated out to a different test module. How do we know that the edge cases are working as expected?
+	if (trace === TRUE) console.log(req); // TRACE this is an optional item only if we want deep tracing
+	//Where can we test to make sure that all the use cases are working? should this be inline as a flag or seperated out to a different test module. 
+	//      How do we know that the edge cases are working as expected?
 	//  TEST: user_id = -1;
 	//  TEST: user_id = "ABCDE";
 	//  TEST: user_id = "multiple values???";
-	//  TESTL user_id = null;
+	//  TEST: user_id = null;
 
 	const schema = Joi.object({user_id: Joi.number().integer().positive().required()});
 	const {error, value: user_id} = schema.validate({user_id: req.params.user_id});
@@ -128,8 +131,8 @@ app.delete.userdata_DB('/user/:user_id', (req, res) => {
 		}
 		console.log(`User, ${user_id}, and associated data were sucessfully deleted from the DB`); // INFO
 		// Can or Should we attempt to retrieve the data and confirm that no records exist in any supporting table? If data is returned, then there is a problem.
-		if DEBUG = TRUE then console.log(results); // DEBUG
-		if TRACE = TRUE then console.log(fields); // TRACE
+		if (debug = TRUE) console.log(results); // DEBUG
+		if (trace = TRUE) console.log(fields); // TRACE
 		res.status(200);
 	});
 });
