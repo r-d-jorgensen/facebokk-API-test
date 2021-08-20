@@ -26,7 +26,7 @@ const dbConnection = mysql.createConnection({
 	port: process.env.DB_PORT,
 	database: process.env.DB_DATABASE,
 });
-
+// TODO: test comment
 // TODO: May need to open and close the connection for each call
 dbConnection.connect((err) => {
 	if (err) {
