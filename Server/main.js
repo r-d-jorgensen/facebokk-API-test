@@ -8,12 +8,12 @@ const fs = require('fs');
 const Joi = require('joi');
 
 const app = express();
-app.use(express.json({limit: '50mb'}));
+app.use(express.json({ limit: '50mb' }));
 app.use(cors());
 
 const sslServer = https.createServer({
-  key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
+	key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+	cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
 }, app);
 
 const WEB_PORT = process.env.WEB_PORT || 8000;
@@ -36,6 +36,7 @@ dbConnection.connect((err) => {
 	console.log("Connected to database.");
 });
 
+// new change
 // TODO: Data needs to be checked BEFORE use... not after
 // TODO: Breakdown of the diffrent DB errors in log file for FATAL, ERROR and WARN levels
 // TODO: Pomises are needed almost everywehre... pick a place.. it needs them
@@ -55,7 +56,7 @@ dbConnection.connect((err) => {
 // TODO: Log files
 // TODO: Facebook may display photos that are in albums or posts multiple times... check for dublicates when posting with idetifier
 app.get('/user/facebook/:facebookID', (req, res) => {
-  const query = `select * from users where facebook_id = ${req.params.facebookID}`;
+	const query = `select * from users where facebook_id = ${req.params.facebookID}`;
 	dbConnection.query(query, (err, data) => {
 		if (err) {
 			console.error("Failed to get user from the DB:\n" + err.stack);
@@ -68,7 +69,7 @@ app.get('/user/facebook/:facebookID', (req, res) => {
 });
 
 app.post('/user/facebook', (req, res) => {
-  const newUser = req.body.data
+	const newUser = req.body.data
 	const query = `
 		insert into users 
 		values (
@@ -94,8 +95,8 @@ app.post('/user/facebook', (req, res) => {
 // Delete user from DB and all data assosiated
 app.delete('/user/:user_id', (req, res) => {
 	console.log(req); // TRACE
-	const schema = Joi.object({user_id: Joi.number().integer().positive().required()});
-	const {error, value: user_id} = schema.validate({user_id: req.params.user_id});
+	const schema = Joi.object({ user_id: Joi.number().integer().positive().required() });
+	const { error, value: user_id } = schema.validate({ user_id: req.params.user_id });
 	if (error) {
 		console.log(`User has sent bad user_id, ${req.params.user_id}, to server`); // INFO
 		console.log(error.details.message) // DEBUG
@@ -136,7 +137,7 @@ app.get('/posts/facebook/:user_id', (req, res) => {
 		where
 			posts.user_id = ${req.params.user_id} and
 			structure_type_ENUM_id = 1;`;
-	
+
 	dbConnection.query(query, (err, result) => {
 		if (err) {
 			console.error("Failed to get posts from the DB:\n" + err.stack);
@@ -168,7 +169,7 @@ app.post('/posts/facebook/:user_id', (req, res) => {
 			'${new Date(post.created_at).toISOString()}}',
 			'${post.message}'
 		);`
-		
+
 		// The begining of the pain
 		dbConnection.query(postQuery, (err, result) => {
 			if (err) {
@@ -190,7 +191,7 @@ app.post('/posts/facebook/:user_id', (req, res) => {
 					\'${image.height}\',
 					null,
 					null);`
-				
+
 				dbConnection.query(imageQuery, (err, result) => {
 					if (err) {
 						console.error("Failed to post images to DB:\n" + err.stack);
@@ -205,7 +206,7 @@ app.post('/posts/facebook/:user_id', (req, res) => {
 						default,
 						${post_id},
 						${image_id});`
-					
+
 					dbConnection.query(attachmentQuery, (err) => {
 						if (err) {
 							console.error("Failed to post attachments to DB:\n" + err.stack);
