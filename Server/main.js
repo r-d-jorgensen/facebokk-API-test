@@ -36,7 +36,6 @@ dbConnection.connect((err) => {
 	console.log("Connected to database.");
 });
 
-// new change
 // TODO: Data needs to be checked BEFORE use... not after
 // TODO: Breakdown of the diffrent DB errors in log file for FATAL, ERROR and WARN levels
 // TODO: Pomises are needed almost everywehre... pick a place.. it needs them
@@ -98,9 +97,9 @@ app.delete('/user/:user_id', (req, res) => {
 	const schema = Joi.object({ user_id: Joi.number().integer().positive().required() });
 	const { error, value: user_id } = schema.validate({ user_id: req.params.user_id });
 	if (error) {
-		console.log(`User has sent bad user_id, ${req.params.user_id}, to server`); // INFO
+		console.log(`User has sent bad user_id, ${req.params.user_id}, to server`); // WARN
 		console.log(error.details.message) // DEBUG
-		console.log(error); //TRACE
+		console.log(error); // TRACE
 		res.status(400).json(error);
 		return;
 	}
@@ -110,7 +109,7 @@ app.delete('/user/:user_id', (req, res) => {
 		if (error) {
 			console.log(`Failed to delete user with id ${user_id} to the server`); // ERROR
 			console.log(error.stack); // DEBUG
-			console.log(error); //TRACE
+			console.log(error); // TRACE
 			res.status(500).send(`DB query failed with error ${error.stack}`);
 			return;
 		}

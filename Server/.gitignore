@@ -10,7 +10,7 @@
 /build
 
 # secrets
-/cert
+/cert/Data-Movers-Key-Pair.pem
 
 # misc
 .DS_Store
