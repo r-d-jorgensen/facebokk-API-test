@@ -36,24 +36,6 @@ dbConnection.connect((err) => {
 	console.log("Connected to database.");
 });
 
-// TODO: Data needs to be checked BEFORE use... not after
-// TODO: Breakdown of the diffrent DB errors in log file for FATAL, ERROR and WARN levels
-// TODO: Pomises are needed almost everywehre... pick a place.. it needs them
-// TODO: Shift routes to own page
-// TODO: Need SSL for DB connection
-// TODO: Look into shifting to Sequelize for queries... https://sequelize.org/master/manual/getting-started.html
-// TODO: Some quiery escaping should be done
-// TODO: May need to implement a pool type connection for post calls.. there are alot of them and concency is a nice thing
-// TODO: Post calls need to be self contained and not bring in data from outside only facebook
-// TODO: Status returns should only happen at the end or at error not whenever a DB call is successful
-// TODO: Look into calls geting stacked in server resulting in duplicate DB queries
-// TODO: Join ENUM vales with ENUM_ids for more readable code and returns
-// TODO: Make 'facebook' in route conform with ENUM_ids of origin_ENUMs
-// TODO: Make 'posts' and 'photos' in route conform with ENUM_ids of structure_type_ENUM then combine them
-// TODO: Create midleware and fix spelling mistakes in DB calls for error and success calls
-// TODO: Hash user_id and other important values
-// TODO: Log files
-// TODO: Facebook may display photos that are in albums or posts multiple times... check for dublicates when posting with idetifier
 app.get('/user/facebook/:facebookID', (req, res) => {
 	const query = `select * from users where facebook_id = ${req.params.facebookID}`;
 	dbConnection.query(query, (err, data) => {
