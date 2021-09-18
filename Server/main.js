@@ -36,6 +36,10 @@ dbConnection.connect((err) => {
 	console.log("Connected to database.");
 });
 
+app.get('/', (req, res) => {
+	res.send("This is a help and doc page response");
+});
+
 app.get('/user/facebook/:facebookID', (req, res) => {
 	const query = `select * from users where facebook_id = ${req.params.facebookID}`;
 	dbConnection.query(query, (err, data) => {
