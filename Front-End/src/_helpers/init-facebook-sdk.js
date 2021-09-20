@@ -1,8 +1,8 @@
 import { accountService } from '_services';
 
 const facebookAppId = process.env.NODE_ENV === "development"
-                        ? process.env.REACT_APP_FACEBOOK_APP_ID_DEV
-                        : process.env.REACT_APP_FACEBOOK_APP_ID;
+    ? process.env.REACT_APP_FACEBOOK_APP_ID_DEV
+    : process.env.REACT_APP_FACEBOOK_APP_ID;
 
 export function initFacebookSdk() {
     return new Promise(resolve => {
@@ -12,9 +12,9 @@ export function initFacebookSdk() {
                 appId: facebookAppId,
                 cookie: true,
                 xfbml: true,
-                version: 'v8.0'
+                version: 'v12.0'
             });
-
+            
             // Auto authenticate with the api if already logged in with facebook
             window.FB.getLoginStatus(({ authResponse }) => {
                 if (authResponse) {

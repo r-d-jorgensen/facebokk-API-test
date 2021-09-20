@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-
 import { accountService } from '_services';
 
 function Login({ history }) {
