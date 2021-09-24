@@ -20,9 +20,7 @@ async function login() {
     });
     if (!authResponse) return;
     await apiAuthenticate(authResponse.accessToken);
-    // get return url from location state or default to home page
-    const { from } = history.location.state || { from: { pathname: "/" } };
-    history.push(from);
+    history.push('/home');
 }
 
 // HACK... this is used to simulate calling the server to auth the user
@@ -42,7 +40,7 @@ function logout() {
     window.FB.api('/me/permissions', 'delete', null, () => window.FB.logout());
     stopAuthenticateTimer();
     accountSubject.next(null);
-    history.push('/login');
+    history.push('/');
 }
 
 // helper methods

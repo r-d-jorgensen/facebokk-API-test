@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { accountService } from '_services';
 
-function Login({ history }) {
+function Landing({ history }) {
     useEffect(() => {
         // redirect to home if already logged in
         if (accountService.accountValue) {
-            history.push('/');
+            history.push('/home');
         }        
     }, [history]);
 
@@ -24,4 +24,4 @@ function Login({ history }) {
     );
 }
 
-export { Login };
+export { Landing };

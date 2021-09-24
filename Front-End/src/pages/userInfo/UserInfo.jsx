@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-import { Error } from '_components/Error';
-
 function UserInfo() {
     const [error, setError] = useState();
     const [account, setAccount] = useState();
     // Account data call
-    // TODO: This call is being made at home... consider inporting data from elsewhere
+    // TODO: This call is being made at home and must be made... consider inporting data from elsewhere of offloading the issue
     useEffect(() => {
         window.FB.api(
             '/me',
@@ -23,7 +21,10 @@ function UserInfo() {
     }, []);
 
     if (!account) return <h1>Loading Your Informaition account information</h1>;
-    if (error) return <Error error={error} />;
+    if (error) {
+        console.log(error); // TODO: notify user of error
+        return;
+    }
     return (
         <div>
             <img src={account.picture.data.url} alt="" width={account.picture.data.width} height={account.picture.data.hight}></img>

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { dateCleaner } from '_helpers';
-import { Error } from '_components/Error';
 
 function Feed() {
   const [error, setError] = useState();
@@ -53,7 +52,10 @@ function Feed() {
   }
 
   if (!feed) return <h3>Loading Your Facebook Feed</h3>;
-  if (error) return <Error error={error} />;
+  if (error) {
+    console.log(error); // TODO: notify user of error
+    return;
+  }
   return (
     <div>
       <h3>Feed [Page 1]:</h3>

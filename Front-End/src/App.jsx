@@ -2,12 +2,12 @@ import React from 'react';
 import { Route, Switch, Redirect} from 'react-router-dom';
 
 import { Nav, PrivateRoute } from '_components';
-import { UserInfo } from 'userInfo/UserInfo';
-import { Login } from 'login/Login';
-import { Photos } from 'photos/Photos';
-import { Posts } from 'photos/Posts';
-import { PhotosSummary } from 'photos/PhotosSummary';
-import { Home } from 'home/Home';
+import { UserInfo } from 'pages/userInfo/UserInfo';
+import { Landing } from 'pages/landing/Landing';
+import { Photos } from 'pages/photos/Photos';
+import { Posts } from 'pages/photos/Posts';
+import { PhotosSummary } from 'pages/photos/PhotosSummary';
+import { Home } from 'pages/home/Home';
 
 function App() {
     return (
@@ -15,12 +15,12 @@ function App() {
             <Nav />
             <div className="container pt-4">
                 <Switch>
-                    <Route exact path="/login" component={Login} />
+                    <Route exact path="/" component={Landing} />
                     <PrivateRoute exact path="/userInfo" component={UserInfo} />
                     <PrivateRoute path="/photos" component={Photos} />
                     <PrivateRoute path="/posts" component={Posts} />
                     <PrivateRoute exact path="/photosSummary" component={PhotosSummary} />
-                    <PrivateRoute exact path="/" component={Home} />
+                    <PrivateRoute exact path="/home" component={Home} />
                     <Redirect from="*" to="/" />
                 </Switch>
             </div>
