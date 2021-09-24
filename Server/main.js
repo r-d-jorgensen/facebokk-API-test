@@ -16,7 +16,7 @@ const sslServer = https.createServer({
 	cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
 }, app);
 
-const WEB_PORT = process.env.WEB_PORT || 8000;
+const WEB_PORT = process.env.WEB_PORT || 80;
 sslServer.listen(WEB_PORT, () => console.log(`Secure server on port ${WEB_PORT}...`));
 
 const dbConnection = mysql.createConnection({

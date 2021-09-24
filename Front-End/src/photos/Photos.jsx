@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { dateCleaner } from '_helpers';
+import { dateCleaner, serverEndpoint } from '_helpers';
 
 function Photos() {
   const [photos, setPhotos] = useState();
@@ -11,7 +11,7 @@ function Photos() {
     const user = JSON.parse(window.sessionStorage.getItem("user"));
 
     (async function getPhotos(user) {
-      const photoData = await axios.get(`https://localhost:8080/photos/facebook/${user.user_id}`)
+      const photoData = await axios.get(`https://${serverEndpoint}/photos/facebook/${user.user_id}`)
         .then(photoData => photoData)
         .catch(error => console.log(error)); // TODO: Implement error display for user
       setPhotos(photoData.data);

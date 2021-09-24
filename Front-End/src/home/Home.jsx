@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 
-import { facebookAPICall } from '_helpers';
+import { facebookAPICall, serverEndpoint } from '_helpers';
 
 function Home() {
     useEffect(() => {
@@ -12,16 +12,17 @@ function Home() {
         async function loginUserWithFacebook() {
             const fbAccount = await facebookAPICall('/me', {"fields":"id,name,email,picture"})
                 .then(fbAccount => fbAccount)
-                .catch(error => console.log(error)); // TODO: log error with server when moved to server
+                .catch(error => console.log(error)); // TODO: show user the error
             if (!fbAccount) {
                 console.log('Facebook did not return any data');
                 return;
             }
-            const existingUser = await axios.get(`https://localhost:8080/user/facebook/${fbAccount.id}`)
+            const existingUser = await axios.get(`https://${serverEndpoint}/user/facebook/${fbAccount.id}`)
                 .then(existingUser => existingUser)
                 .catch(error => console.log(error)); // TODO: Implement error display for user
+                
             if (existingUser.data.length === 0) {
-                const newUser = await axios.post(`https://localhost:8080/user/facebook`, {
+                const newUser = await axios.post(`https://${serverEndpoint}/user/facebook`, {
                     data: {
                         user_type_ENUM_id: 3,
                         facebook_id: fbAccount.id,

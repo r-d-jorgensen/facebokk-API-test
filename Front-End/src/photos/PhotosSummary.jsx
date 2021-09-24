@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 
 import { accountService } from '_services';
-import { facebookAPICall } from '_helpers';
+import { facebookAPICall, serverEndpoint } from '_helpers';
 
 // TODO: Create more expanitive error statments
 function PhotosSummary() {
@@ -28,7 +28,7 @@ function PhotosSummary() {
     async function syncronizePhotos(user) {
       const fields = {"fields":"id,created_time,images,name"};
       const url = "/me/photos";
-      const savedPhotoData = await axios.get(`https://localhost:8080/photos/facebook/${user.user_id}`) // TODO: Should be turned into a promise
+      const savedPhotoData = await axios.get(`https://${serverEndpoint}/photos/facebook/${user.user_id}`) // TODO: Should be turned into a promise
         .then(savedPhotoData => savedPhotoData)
         .catch(error => console.log(error)); // TODO: log error with server when moved to server
       const newPhotoData = await getNewFBData(user, 'photo', fields, url);
@@ -41,7 +41,7 @@ function PhotosSummary() {
       }
 
       const allPhotos = savedPhotoData.data.concat(newPhotoData.newData); //TODO: Remove when posted photos works
-      axios.post(`https://localhost:8080/photos/facebook/${user.user_id}`, {
+      axios.post(`https://${serverEndpoint}/photos/facebook/${user.user_id}`, {
         photos: newPhotoData.newData,
         deepest_checkpoint: newPhotoData.deepest_checkpoint,
         passedSyncs: newPhotoData.passedSyncs,
@@ -55,7 +55,7 @@ function PhotosSummary() {
     async function syncronizePosts(user) {
       const fields = {"fields":"id,type,message,created_time,attachments"};
       const url = "/me/posts";
-      const savedPostData = await axios.get(`https://localhost:8080/posts/facebook/${user.user_id}`);
+      const savedPostData = await axios.get(`https://${serverEndpoint}/posts/facebook/${user.user_id}`);
       const newPostData = await getNewFBData(user, 'post', fields, url);
       // Failed to load new data from FB
       // TODO: Tell user that it failed and why
@@ -80,7 +80,7 @@ function PhotosSummary() {
       });
 
       const allPosts = savedPostData.data.concat(newPostImages);
-      axios.post(`https://localhost:8080/posts/facebook/${user.user_id}`, {
+      axios.post(`https://${serverEndpoint}/posts/facebook/${user.user_id}`, {
         posts: newPostData.newData,
         deepest_checkpoint: newPostData.deepest_checkpoint,
         passedSyncs: newPostData.passedSyncs,
@@ -95,7 +95,7 @@ function PhotosSummary() {
       let newData = [];
       let passedSyncs = []; // For diging into past syncs that did not reach the floor... TODO: rename
       // TODO: move up to repective synco calls
-      const syncData = await axios.get(`https://localhost:8080/sync/${format}/facebook/${user.user_id}`)
+      const syncData = await axios.get(`https://${serverEndpoint}/sync/${format}/facebook/${user.user_id}`)
         .then(syncData => syncData)
         .catch(error => console.log(error)); // TODO: log error with server when moved to server
       const throtleAmount = 5; // TODO: Get the throtle amount from DB or calculate it
@@ -211,7 +211,7 @@ function PhotosSummary() {
   // TODO: Ask for conformation before firing the full delete
   function deleteUser() {
     // TODO: needs to not logout user if catch is trigered
-    axios.delete(`https://localhost:8080/user/${user.user_id}`)
+    axios.delete(`https://${serverEndpoint}/user/${user.user_id}`)
       .catch((error) => {
         // TODO: This code should be ofloaded to a helper function
         if (error.response) {

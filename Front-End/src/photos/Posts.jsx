@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { dateCleaner } from '_helpers';
+import { dateCleaner, serverEndpoint } from '_helpers';
 
 // TODO: Move the Photos and Posts pages into one component or have them do diffrent things
 function Posts() {
@@ -19,7 +19,7 @@ function Posts() {
     const user = JSON.parse(window.sessionStorage.getItem("user"));
 
     (async function getPhotos(user) {
-      const postData = await axios.get(`https://localhost:8080/posts/facebook/${user.user_id}`)
+      const postData = await axios.get(`https://${serverEndpoint}/posts/facebook/${user.user_id}`)
         .then(postData => postData)
         .catch(error => console.log(error)); // TODO: Implement error display for user
       setPosts(postData.data);
@@ -61,9 +61,9 @@ function Posts() {
       <div style={{display: "grid", gridTemplateColumns: displayTypes[displayType].collumns, gridColumnGap: "10px", gridRowGap: "10px"}}>
         {posts.map(post =>
         <div
-          key={post.id}
-          onClick={() => toggleSelection(post.id)} 
-          style={selectedPosts.includes(post.id) ? {border: "2px solid blue", borderRadius: "5px"} : {padding: "2px"}}>
+          key={post.post_id}
+          onClick={() => toggleSelection(post.post_id)} 
+          style={selectedPosts.includes(post.post_id) ? {border: "2px solid blue", borderRadius: "5px"} : {padding: "2px"}}>
           <img
             src={post.src_link}
             alt={post.message === "null" ? "No Caption Given" : post.message}
