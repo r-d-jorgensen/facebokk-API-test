@@ -1,4 +1,6 @@
-a { cursor: pointer }
+a {
+    cursor: pointer 
+}
 
 .btn-facebook {
     background: #3B5998;
@@ -9,10 +11,4 @@ a { cursor: pointer }
 .btn-facebook:hover {
     color: #fff;
     opacity: 0.8;
-}
-
-.btn-delete-account {
-    width: 40px;
-    text-align: center;
-    box-sizing: content-box;
 }
