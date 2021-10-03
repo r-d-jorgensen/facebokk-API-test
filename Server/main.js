@@ -3,7 +3,6 @@ const express = require('express');
 const mysql = require('mysql');
 const cors = require('cors');
 const https = require('https');
-const path = require('path');
 const fs = require('fs');
 const Joi = require('joi');
 
@@ -11,13 +10,13 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(cors());
 
-const sslServer = https.createServer({
-	key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
-	cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
-}, app);
-
-const WEB_PORT = process.env.WEB_PORT || 80;
-sslServer.listen(WEB_PORT, () => console.log(`Secure server on port ${WEB_PORT}...`));
+https.createServer({
+	key: fs.readFileSync('cert/key.pem'),
+	cert: fs.readFileSync('cert/cert.pem'),
+}, app)
+.listen(process.env.WEB_PORT, () => 
+  console.log(`Secure server on port ${process.env.WEB_PORT}...`)
+);
 
 const dbConnection = mysql.createConnection({
 	host: process.env.DB_HOST,
